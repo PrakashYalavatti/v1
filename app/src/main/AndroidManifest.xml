@@ -40,10 +40,6 @@
             android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".Screen1"
             android:windowSoftInputMode="adjustPan"/>
-        <activity android:name=".DAP20"
-            android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="landscape"
-            android:configChanges="orientation|screenSize"/>
         <activity android:name=".apputils.ApkDownloadAndInstallActivity"/>
 
         <provider
