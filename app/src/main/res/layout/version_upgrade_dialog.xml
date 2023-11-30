@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:minWidth="200dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#E7E7E7"
+        android:padding="10dp"
+        android:gravity="center"
+        android:text="Please download the assigned apk version from the link"
+        android:textColor="#546A79"
+        android:textSize="16sp"
+        android:typeface="serif" />
+
+    <TextView
+        android:id="@+id/version_detail_from_api"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="30dp"
+        android:paddingBottom="30dp"
+        android:text="apk"
+        android:textSize="16sp" />
+
+</LinearLayout>

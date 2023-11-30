@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="user_login">User Login</string>
+    <string name="main_menu">Main Menu</string>
+    <string name="dap_20">Emergence 20 DAP</string>
+    <string name="dap">DAP Selection Screen</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="at_planting">At Planting</string>
+    <string name="layout">Layout</string>
+    <string name="dap_30">Emergence 30 DAP</string>
+    <string name="internet_connection">Please enable the Internet Connection...</string>
+    <string name="data_not_saved_internet">Data not saved...!\nPlease enable internet Connection...</string>
+</resources>

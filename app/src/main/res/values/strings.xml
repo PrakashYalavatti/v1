@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">Technico Agri<!-- R &amp; D--></string>
+    <string name="plantation_day">Plantation Day</string>
+    <string name="user_login">User Login</string>
+    <string name="main_menu">Main Menu</string>
+    <string name="commercial_ct">Commercial-CT</string>
+    <string name="performance_evaluation_pet">Performance Evaluation-PET</string>
+    <string name="select_plantation_date">Select Plantation Date</string>
+    <string name="plot_size">P x P</string>
+    <string name="row_to_row_distance">R x R</string>
+    <string name="dap_20">Emergence 20 DAP</string>
+    <string name="dap_45">45 DAP</string>
+    <string name="dap">DAP Selection Screen</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="at_planting">At Planting</string>
+    <string name="layout">Layout</string>
+    <string name="dap_30">Emergence 30 DAP</string>
+    <string name="internet_connection">Please enable the Internet Connection...</string>
+    <string name="data_not_saved_internet">Data not saved...!\nPlease enable internet Connection...</string>
+    <string-array name="sp1">
+        <item>Variety Code</item>
+        <item>Code1</item>
+        <item>Code2</item>
+    </string-array>
+
+    <string-array name="sp2">
+        <item>Variety Name</item>
+        <item>V Name1</item>
+        <item>V Name2</item>
+    </string-array>
+
+    <string-array name="sp3">
+        <item>Purpose</item>
+        <item>Purpose1</item>
+        <item>Purpose2</item>
+    </string-array>
+
+    <string-array name="plot_size">
+        <item>Plot Size</item>
+        <item>18 cm</item>
+        <item>20 cm</item>
+    </string-array>
+
+    <string-array name="row_distance">
+        <item>Row Distance</item>
+        <item>30\""</item>
+        <item>45\""</item>
+    </string-array>
+
+</resources>
