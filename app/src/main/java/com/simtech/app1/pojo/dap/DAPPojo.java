@@ -12,4 +12,5 @@ public class DAPPojo {
     public String l4;
     public String canopy;
     public String remarks;
+    public String fromdap;
 }

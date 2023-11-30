@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.gson.Gson;
 import com.simtech.app1.BuildConfig;
 import com.simtech.app1.PlantationActivity;
 import com.simtech.app1.R;
@@ -233,6 +234,14 @@ public class UIUtils {
                 date = LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE);
                 yearOnly = date.getYear();
             }
+            String observation = "";
+            if(observationType.contains("20 DAP")){
+                observation = "20dap";
+            } else if(observationType.contains("30 DAP")){
+                observation = "30dap";
+            } else if(observationType.contains("45 DAP")){
+                observation = "45dap";
+            }
             // Create a JSONObject and add key-value pairs
             DAPPojo dapPojo = new DAPPojo();
             dapPojo.locationid = locationId;
@@ -246,6 +255,7 @@ public class UIUtils {
             dapPojo.l4 = textL4;
             dapPojo.canopy = textCanopy;
             dapPojo.remarks = textRemarks;
+            dapPojo.fromdap = observation;
             if (UIUtils.isNetworkAvailable(context)) {
                 callApiForDapInsertion(context, dapPojo);
             } else {
@@ -265,7 +275,14 @@ public class UIUtils {
 
     private static void callApiForDapInsertion(Context context, DAPPojo dapPojo) {
         apiInterface = APIClient.getClient().create(APIInterface.class);
-        Call<UserLoginResponse> call = apiInterface.observation20dap(dapPojo);
+        Call<UserLoginResponse> call = apiInterface.observation(dapPojo);
+        Gson gson = new Gson();
+
+        // Convert POJO to JSON
+        String jsonString = gson.toJson(dapPojo);
+
+        // Print the JSON representation
+        System.out.println(jsonString);
         call.enqueue(new Callback<UserLoginResponse>() {
             @Override
             public void onResponse(Call<UserLoginResponse> call, Response<UserLoginResponse> response) {

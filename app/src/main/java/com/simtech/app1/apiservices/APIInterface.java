@@ -36,6 +36,6 @@ public interface APIInterface {
     @PATCH("/api/plantationupdate")
     Call<UserLoginResponse> plantationupdate(@Body PlantingPojo PlantingPojo);
 
-    @PATCH("/api/observation20dap")
-    Call<UserLoginResponse> observation20dap(@Body DAPPojo DAP);
+    @PATCH("/api/observation")
+    Call<UserLoginResponse> observation(@Body DAPPojo DAP);
 }
