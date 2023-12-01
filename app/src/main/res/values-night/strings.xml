@@ -11,4 +11,6 @@
     <string name="dap_30">Emergence 30 DAP</string>
     <string name="internet_connection">Please enable the Internet Connection...</string>
     <string name="data_not_saved_internet">Data not saved...!\nPlease enable internet Connection...</string>
+    <string name="gps_switch_on">Please switch on GPS</string>
+    <string name="gps_not_captured">GPS not captured, please try again</string>
 </resources>

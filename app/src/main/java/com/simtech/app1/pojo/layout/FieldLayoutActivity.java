@@ -1,20 +1,40 @@
 package com.simtech.app1.pojo.layout;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.Priority;
+import com.google.android.gms.tasks.Task;
 import com.simtech.app1.LoginActivity;
 import com.simtech.app1.MainMenuActivity;
 import com.simtech.app1.R;
@@ -36,6 +56,16 @@ public class FieldLayoutActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private RecyclerView ParentRecyclerViewItem;
     private LinearLayout lytHeader;
+    private Button btnCaptureGps;
+
+    private static final int REQUEST_LOCATION_PERMISSION = 1;
+    private static final int REQUEST_LOCATION_SETTINGS = 2;
+
+    private FusedLocationProviderClient mFusedLocationClient;
+    private LocationRequest mLocationRequest;
+    private LocationCallback mLocationCallback;
+    private LocationSettingsRequest mLocationSettingsRequest;
+    private Location mCurrentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +77,7 @@ public class FieldLayoutActivity extends AppCompatActivity {
         plantingDateTextView = (TextView) findViewById(R.id.plantingDateTextView);
         selectedTrialTextView = (TextView) findViewById(R.id.selectedTrialTextView);
         lytHeader = (LinearLayout) findViewById(R.id.lytHeader);
+        btnCaptureGps = (Button) findViewById(R.id.btnCaptureGps);
 
         mCredentialsStorage = getSharedPreferences("AppSharedPreferences", MODE_PRIVATE);
         token = mCredentialsStorage.getString(LoginActivity.TOKEN, null);
@@ -73,6 +104,17 @@ public class FieldLayoutActivity extends AppCompatActivity {
             }
         });
 
+        btnCaptureGps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Initialize FusedLocationProviderClient
+                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(FieldLayoutActivity.this);
+
+                // Request location permissions at runtime
+                requestLocationPermissions();
+            }
+        });
+
         ParentRecyclerViewItem = findViewById(R.id.recyclerListView);
 
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -86,6 +128,133 @@ public class FieldLayoutActivity extends AppCompatActivity {
         FieldLayoutActivity.this.getOnBackPressedDispatcher().addCallback(FieldLayoutActivity.this, callback);
     }
 
+    private void requestLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted, request it
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION_PERMISSION
+            );
+        } else {
+            // Permission is already granted, proceed with location requests
+            initGps();
+        }
+    }
+
+    private void initGps() {
+        // Initialize LocationRequest
+        mLocationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
+                .setWaitForAccurateLocation(false)
+                .setMinUpdateIntervalMillis(500)
+                .setMaxUpdateDelayMillis(1000)
+                .build();
+
+        // Initialize LocationCallback
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                // location is received
+                mCurrentLocation = locationResult.getLastLocation();
+                updateLocationUI();
+            }
+        };
+
+        // Initialize LocationSettingsRequest
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(mLocationRequest);
+        mLocationSettingsRequest = builder.build();
+
+        // Request location updates
+        startLocationUpdates();
+    }
+
+    private void startLocationUpdates() {
+        // Check for location permissions
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            // Ensure mLocationCallback is not null before using it
+            if (mLocationCallback == null) {
+                Log.e("MainActivity", "mLocationCallback is null");
+                return;
+            }
+
+            try {
+                // Check if location settings are satisfied
+                checkLocationSettings();
+            } catch (SecurityException e) {
+                e.printStackTrace();
+                // Handle permission-related exception
+            }
+        } else {
+            // Handle the case where location permissions are not granted
+            requestLocationPermissions();
+        }
+    }
+
+    private void checkLocationSettings() {
+        Task<LocationSettingsResponse> task = LocationServices.getSettingsClient(this)
+                .checkLocationSettings(mLocationSettingsRequest);
+
+        task.addOnSuccessListener(locationSettingsResponse -> {
+            // Location settings are satisfied, initiate location requests
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            mFusedLocationClient.requestLocationUpdates(
+                    mLocationRequest,
+                    mLocationCallback,
+                    Looper.myLooper()
+            );
+        });
+
+        ((Task<?>) task).addOnFailureListener(e -> {
+            // Handle failure, prompt user to enable location services
+            if (e instanceof ResolvableApiException) {
+                try {
+                    ((ResolvableApiException) e).startResolutionForResult(
+                            this,
+                            REQUEST_LOCATION_SETTINGS
+                    );
+                } catch (IntentSender.SendIntentException sendEx) {
+                    // Handle the exception
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_LOCATION_SETTINGS) {
+            if (resultCode == RESULT_OK) {
+                // User enabled location settings, proceed with location requests
+                startLocationUpdates();
+            } else {
+                // User did not enable location settings, handle accordingly
+                // You may want to show a message or take appropriate action
+            }
+        }
+    }
+
+    private void updateLocationUI() {
+        if (mCurrentLocation != null) {
+            String locationString = "Latitude: " + mCurrentLocation.getLatitude()
+                    + "\nLongitude: " + mCurrentLocation.getLongitude();
+            Toast.makeText(this, locationString, Toast.LENGTH_SHORT).show();
+            Log.e("GPS", locationString);
+        }
+    }
+
     private void callLayoutAPI() {
         showProgressBar();
         apiInterface = APIClient.getClient().create(APIInterface.class);
@@ -95,10 +264,10 @@ public class FieldLayoutActivity extends AppCompatActivity {
             public void onResponse(Call<LayoutDetailsPojo> call, Response<LayoutDetailsPojo> response) {
                 if (response.isSuccessful()) {
                     LayoutDetailsPojo mainMenuResponse = response.body();
-                    if(mainMenuResponse != null && mainMenuResponse.getData() != null){
+                    if (mainMenuResponse != null && mainMenuResponse.getData() != null) {
                         LinearLayoutManager layoutManager = new LinearLayoutManager(FieldLayoutActivity.this);
 
-                        if(mainMenuResponse.getData().size() != 0 && mainMenuResponse.getData() != null){
+                        if (mainMenuResponse.getData().size() != 0 && mainMenuResponse.getData() != null) {
                             hideProgressBar();
                             LocationDetailsDataPojo data = mainMenuResponse.getData().get(0);
                             String farmerName = data.getFarmer_name();
@@ -149,10 +318,28 @@ public class FieldLayoutActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(UIUtils.isNetworkAvailable(FieldLayoutActivity.this)) {
+        if (UIUtils.isNetworkAvailable(FieldLayoutActivity.this)) {
             callLayoutAPI();
         } else {
             Toast.makeText(FieldLayoutActivity.this, getString(R.string.internet_connection), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopLocationUpdates();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
+    private void stopLocationUpdates() {
+        if (mFusedLocationClient != null && mLocationCallback != null) {
+            mFusedLocationClient.removeLocationUpdates(mLocationCallback);
         }
     }
 }
