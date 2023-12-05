@@ -59,7 +59,7 @@ public class LogCreation {
     }
 
     private static File createMainFolderIfNotExist() {
-        File file = new File(getModelApplication().getExternalFilesDir(null) + "/salesEdge");
+        File file = new File(getModelApplication().getExternalFilesDir(null) + "/rdseed");
         if (!file.exists()) {
             try {
                 file.mkdir();

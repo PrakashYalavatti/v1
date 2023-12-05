@@ -1,6 +1,7 @@
 package com.simtech.app1.pojo.layout;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -46,7 +48,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FieldLayoutActivity extends AppCompatActivity {
+public class FieldLayoutActivity extends AppCompatActivity implements View.OnClickListener {
     private String observation;
     private APIInterface apiInterface;
     private SharedPreferences mCredentialsStorage;
@@ -66,6 +68,8 @@ public class FieldLayoutActivity extends AppCompatActivity {
     private LocationCallback mLocationCallback;
     private LocationSettingsRequest mLocationSettingsRequest;
     private Location mCurrentLocation;
+    private double latitude, longitude;
+    private String locationString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,11 +111,8 @@ public class FieldLayoutActivity extends AppCompatActivity {
         btnCaptureGps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Initialize FusedLocationProviderClient
-                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(FieldLayoutActivity.this);
-
-                // Request location permissions at runtime
                 requestLocationPermissions();
+                fieldCustomDialog(latitude, longitude);
             }
         });
 
@@ -126,6 +127,12 @@ public class FieldLayoutActivity extends AppCompatActivity {
         };
 
         FieldLayoutActivity.this.getOnBackPressedDispatcher().addCallback(FieldLayoutActivity.this, callback);
+    }
+    private void captureGps() {
+        // Initialize FusedLocationProviderClient
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(FieldLayoutActivity.this);
+        // Request location permissions at runtime
+        requestLocationPermissions();
     }
 
     private void requestLocationPermissions() {
@@ -248,10 +255,8 @@ public class FieldLayoutActivity extends AppCompatActivity {
 
     private void updateLocationUI() {
         if (mCurrentLocation != null) {
-            String locationString = "Latitude: " + mCurrentLocation.getLatitude()
-                    + "\nLongitude: " + mCurrentLocation.getLongitude();
-            Toast.makeText(this, locationString, Toast.LENGTH_SHORT).show();
-            Log.e("GPS", locationString);
+            latitude = mCurrentLocation.getLatitude();
+            longitude = mCurrentLocation.getLongitude();
         }
     }
 
@@ -318,6 +323,7 @@ public class FieldLayoutActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        captureGps();
         if (UIUtils.isNetworkAvailable(FieldLayoutActivity.this)) {
             callLayoutAPI();
         } else {
@@ -340,6 +346,63 @@ public class FieldLayoutActivity extends AppCompatActivity {
     private void stopLocationUpdates() {
         if (mFusedLocationClient != null && mLocationCallback != null) {
             mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        }
+    }
+
+    private void fieldCustomDialog(double latitude, double longitude) {
+        // Create custom dialog instance
+        Dialog customDialog = new Dialog(this);
+        customDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        customDialog.setContentView(R.layout.field_custom_dialog);
+
+        // Find buttons in the custom dialog
+        Button topLeftButton = customDialog.findViewById(R.id.topLeftButton);
+        Button topRightButton = customDialog.findViewById(R.id.topRightButton);
+        Button bottomLeftButton = customDialog.findViewById(R.id.bottomLeftButton);
+        Button bottomRightButton = customDialog.findViewById(R.id.bottomRightButton);
+
+        // Set click listeners for buttons
+        topLeftButton.setOnClickListener(this);
+        topRightButton.setOnClickListener(this);
+        bottomLeftButton.setOnClickListener(this);
+        bottomRightButton.setOnClickListener(this);
+
+        // Show the custom dialog
+        customDialog.show();
+    }
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.topLeftButton:
+                // Handle top left button click
+                locationString = "Latitude: " + mCurrentLocation.getLatitude()
+                        + "\nLongitude: " + mCurrentLocation.getLongitude();
+                Toast.makeText(this, locationString, Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.topRightButton:
+                // Handle top right button click
+                locationString = "Latitude: " + mCurrentLocation.getLatitude()
+                        + "\nLongitude: " + mCurrentLocation.getLongitude();
+                Toast.makeText(this, locationString, Toast.LENGTH_SHORT).show();
+                Log.e("GPS", locationString);
+                break;
+
+            case R.id.bottomLeftButton:
+                // Handle bottom left button click
+                locationString = "Latitude: " + mCurrentLocation.getLatitude()
+                        + "\nLongitude: " + mCurrentLocation.getLongitude();
+                Toast.makeText(this, locationString, Toast.LENGTH_SHORT).show();
+                Log.e("GPS", locationString);
+                break;
+
+            case R.id.bottomRightButton:
+                // Handle bottom right button click
+                locationString = "Latitude: " + mCurrentLocation.getLatitude()
+                        + "\nLongitude: " + mCurrentLocation.getLongitude();
+                Toast.makeText(this, locationString, Toast.LENGTH_SHORT).show();
+                Log.e("GPS", locationString);
+                break;
         }
     }
 }
