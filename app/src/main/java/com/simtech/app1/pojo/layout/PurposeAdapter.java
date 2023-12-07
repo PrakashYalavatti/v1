@@ -46,10 +46,14 @@ public class PurposeAdapter extends RecyclerView.Adapter<PurposeAdapter.ViewHold
         // ... (bind other data)
 
         // Set up nested RecyclerView for observations with horizontal layout
-        ObservationAdapter observationAdapter = new ObservationAdapter(context, observationType, purpose.getPurpose(), purpose.getObservations(), startDate, locationName, locationId, trialTypeName, trialTypeId, nReplications, nObservationLines);
-        GridLayoutManager layoutManager = new GridLayoutManager(context, Integer.parseInt(nReplications));
-        holder.observationRecyclerView.setLayoutManager(layoutManager);
-        holder.observationRecyclerView.setAdapter(observationAdapter);
+        if(purpose.getObservations().size() != 0 && purpose.getObservations() != null) {
+            ObservationAdapter observationAdapter = new ObservationAdapter(context, observationType, purpose.getPurpose(), purpose.getObservations(), startDate, locationName, locationId, trialTypeName, trialTypeId, nReplications, nObservationLines);
+            GridLayoutManager layoutManager = new GridLayoutManager(context, Integer.parseInt(nReplications));
+            holder.observationRecyclerView.setLayoutManager(layoutManager);
+            holder.observationRecyclerView.setAdapter(observationAdapter);
+        } else {
+            holder.tvNoData.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -58,13 +62,14 @@ public class PurposeAdapter extends RecyclerView.Adapter<PurposeAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView purposeTextView;
+        TextView purposeTextView, tvNoData;
         RecyclerView observationRecyclerView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             purposeTextView = itemView.findViewById(R.id.purposeTextView);
             observationRecyclerView = itemView.findViewById(R.id.observationRecyclerView);
+            tvNoData = itemView.findViewById(R.id.tvNoData);
             // ... (initialize other views)
         }
     }

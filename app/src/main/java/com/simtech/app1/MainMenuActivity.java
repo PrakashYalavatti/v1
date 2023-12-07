@@ -77,15 +77,31 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onResponse(Call<MainMenuResponse> call, Response<MainMenuResponse> response) {
                 if (response.isSuccessful()) {
                     MainMenuResponse mainMenuResponse = response.body();
-                    if (mainMenuResponse != null && !mainMenuResponse.getData().isEmpty()) {
-                        hideProgressBar();
-                        MainMenuAdapter mainMenuAdapter = new MainMenuAdapter(mainMenuResponse.getData(), MainMenuActivity.this);
-                        rvDashboard.setAdapter(mainMenuAdapter);
+                    if (mainMenuResponse != null) {
+                        int statusCode = response.code();
+                        switch (statusCode) {
+                            case 200:
+                                if (mainMenuResponse != null && mainMenuResponse.getData() !=null) {
+                                    hideProgressBar();
+                                    MainMenuAdapter mainMenuAdapter = new MainMenuAdapter(mainMenuResponse.getData(), MainMenuActivity.this);
+                                    rvDashboard.setAdapter(mainMenuAdapter);
+                                } else {
+                                    hideProgressBar();
+                                    UIUtils.customToastMsg(MainMenuActivity.this, "No Data Found...");
+                                }
+                                break;
+                            default:
+                                // Handle other response codes
+                                UIUtils.customToastMsg(MainMenuActivity.this, "Unexpected response code: " + statusCode);
+                        }
+                    } else {
+                        // Handle the case where the response body is null
+                        UIUtils.customToastMsg(MainMenuActivity.this, "Response body is empty or null.");
                     }
                     // Handle the successful response here
                 } else {
                     // Handle the unsuccessful response here
-                    UIUtils.customToastMsg(MainMenuActivity.this, "Error");
+                    UIUtils.customToastMsg(MainMenuActivity.this, "Error in response");
                 }
             }
 

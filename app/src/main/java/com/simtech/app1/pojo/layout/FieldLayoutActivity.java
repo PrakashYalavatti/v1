@@ -22,6 +22,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,6 +44,8 @@ import com.simtech.app1.R;
 import com.simtech.app1.apiservices.APIClient;
 import com.simtech.app1.apiservices.APIInterface;
 import com.simtech.app1.apputils.UIUtils;
+
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -70,6 +73,8 @@ public class FieldLayoutActivity extends AppCompatActivity implements View.OnCli
     private Location mCurrentLocation;
     private double latitude, longitude;
     private String locationString;
+    private TextView tvNoData;
+    private CardView cardViewLyt1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +87,8 @@ public class FieldLayoutActivity extends AppCompatActivity implements View.OnCli
         selectedTrialTextView = (TextView) findViewById(R.id.selectedTrialTextView);
         lytHeader = (LinearLayout) findViewById(R.id.lytHeader);
         btnCaptureGps = (Button) findViewById(R.id.btnCaptureGps);
+        tvNoData = (TextView) findViewById(R.id.tvNoData);
+        cardViewLyt1 = (CardView) findViewById(R.id.cardViewLyt1);
 
         mCredentialsStorage = getSharedPreferences("AppSharedPreferences", MODE_PRIVATE);
         token = mCredentialsStorage.getString(LoginActivity.TOKEN, null);
@@ -269,32 +276,59 @@ public class FieldLayoutActivity extends AppCompatActivity implements View.OnCli
             public void onResponse(Call<LayoutDetailsPojo> call, Response<LayoutDetailsPojo> response) {
                 if (response.isSuccessful()) {
                     LayoutDetailsPojo mainMenuResponse = response.body();
-                    if (mainMenuResponse != null && mainMenuResponse.getData() != null) {
-                        LinearLayoutManager layoutManager = new LinearLayoutManager(FieldLayoutActivity.this);
+                    if (mainMenuResponse != null) {
+                        int statusCode = response.code();
+                        switch (statusCode) {
+                            case 200:
+                                LinearLayoutManager layoutManager = new LinearLayoutManager(FieldLayoutActivity.this);
+                                if (mainMenuResponse.getData().size() != 0 && mainMenuResponse.getData() != null) {
+                                    LocationDetailsDataPojo data = mainMenuResponse.getData().get(0);
+                                    if(data != null){
+                                        progressBar.setVisibility(View.GONE);
+                                        tvNoData.setVisibility(View.GONE);
+                                        lytHeader.setVisibility(View.VISIBLE);
+                                        String farmerName = data.getFarmer_name();
+                                        String locationName = data.getLocation_name();
+                                        String plantingDate = data.getStart_date();
+                                        String nRelications = data.getN_replications();
+                                        String nObservationLine = data.getN_observation_lines();
 
-                        if (mainMenuResponse.getData().size() != 0 && mainMenuResponse.getData() != null) {
-                            hideProgressBar();
-                            LocationDetailsDataPojo data = mainMenuResponse.getData().get(0);
-                            String farmerName = data.getFarmer_name();
-                            String locationName = data.getLocation_name();
-                            String plantingDate = data.getStart_date();
-                            String nRelications = data.getN_replications();
-                            String nObservationLine = data.getN_observation_lines();
-
-                            farmersNameTextView.setText("Farmer's Name: " + farmerName);
-                            locationTextView.setText("Location: " + locationName);
-                            plantingDateTextView.setText("Planting Date: " + plantingDate);
-                            selectedTrialTextView.setText("Trial Type: " + trialTypeName);
-
-                            LocationDetailsAdapter parentItemAdapter = new LocationDetailsAdapter(FieldLayoutActivity.this, observationType, data);
-                            ParentRecyclerViewItem.setAdapter(parentItemAdapter);
-                            ParentRecyclerViewItem.setLayoutManager(layoutManager);
-                        } else {
-                            UIUtils.customToastMsg(FieldLayoutActivity.this, "No data Found");
-                            hideProgressBar();
+                                        farmersNameTextView.setText("Farmer's Name: " + farmerName);
+                                        locationTextView.setText("Location: " + locationName);
+                                        plantingDateTextView.setText("Planting Date: " + plantingDate);
+                                        selectedTrialTextView.setText("Trial Type: " + trialTypeName);
+                                        if(data.getPurposes() != null && data.getPurposes().size() != 0){
+                                            ArrayList<ObservationPojo> pojoData = data.getPurposes().get(0).getObservations();
+                                            if(pojoData != null && pojoData.size() != 0){
+                                                ParentRecyclerViewItem.setVisibility(View.VISIBLE);
+                                                lytHeader.setVisibility(View.VISIBLE);
+                                                cardViewLyt1.setVisibility(View.VISIBLE);
+                                                LocationDetailsAdapter parentItemAdapter = new LocationDetailsAdapter(FieldLayoutActivity.this, observationType, data);
+                                                ParentRecyclerViewItem.setAdapter(parentItemAdapter);
+                                                ParentRecyclerViewItem.setLayoutManager(layoutManager);
+                                            }
+                                        }
+                                    } else {
+                                        cardViewLyt1.setVisibility(View.GONE);
+                                        tvNoData.setVisibility(View.VISIBLE);
+                                        lytHeader.setVisibility(View.GONE);
+                                        progressBar.setVisibility(View.GONE);
+                                    }
+                                } else {
+                                    UIUtils.customToastMsg(FieldLayoutActivity.this, "No data Found");
+                                    progressBar.setVisibility(View.GONE);
+                                    tvNoData.setVisibility(View.VISIBLE);
+                                }
+                                break;
+                            // Add more cases for other response codes as needed
+                            default:
+                                // Handle other response codes
+                                UIUtils.customToastMsg(FieldLayoutActivity.this, "Unexpected response code: " + statusCode);
                         }
+                    } else {
+                        // Handle the case where the response body is null
+                        UIUtils.customToastMsg(FieldLayoutActivity.this, "Response body is empty or null.");
                     }
-                    // Handle the successful response here
                 } else {
                     // Handle the unsuccessful response here
                     UIUtils.customToastMsg(FieldLayoutActivity.this, "Error");
@@ -314,11 +348,11 @@ public class FieldLayoutActivity extends AppCompatActivity implements View.OnCli
         lytHeader.setVisibility(View.GONE);
     }
 
-    private void hideProgressBar() {
+    /*private void hideProgressBar() {
         progressBar.setVisibility(View.GONE);
         ParentRecyclerViewItem.setVisibility(View.VISIBLE);
         lytHeader.setVisibility(View.VISIBLE);
-    }
+    }*/
 
     @Override
     protected void onResume() {

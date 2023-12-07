@@ -42,11 +42,11 @@
             android:layout_marginTop="40dp"
             android:layout_marginEnd="80dp"
             android:background="@drawable/round_rect_edittext"
-            android:hint="Enter UserName"
+            android:hint="Enter Name"
             android:typeface="serif"
+            android:text="shivani"
             android:inputType="textEmailAddress"
             android:paddingLeft="10dp"
-            android:text="abc"
             android:textColorHint="@color/black" />
 
         <!--edit text for user password-->
@@ -61,9 +61,9 @@
             android:typeface="serif"
             android:background="@drawable/round_rect_edittext"
             android:hint="Enter Password"
+            android:text="123456"
             android:inputType="textPassword"
             android:paddingLeft="10dp"
-            android:text="abc"
             android:textColorHint="@color/black" />
 
         <Button

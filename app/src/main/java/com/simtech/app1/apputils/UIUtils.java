@@ -19,6 +19,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.gson.Gson;
 import com.simtech.app1.BuildConfig;
+import com.simtech.app1.LoginActivity;
 import com.simtech.app1.PlantationActivity;
 import com.simtech.app1.R;
 import com.simtech.app1.apiservices.APIClient;
@@ -288,7 +289,18 @@ public class UIUtils {
             public void onResponse(Call<UserLoginResponse> call, Response<UserLoginResponse> response) {
                 if (response.isSuccessful()) {
                     UserLoginResponse dapResponse = response.body();
-                    Toast.makeText(context, dapResponse.message, Toast.LENGTH_SHORT).show();
+                    if (dapResponse != null) {
+                        int statusCode = response.code();
+                        switch (statusCode) {
+                            case 200:
+                                Toast.makeText(context, dapResponse.message, Toast.LENGTH_SHORT).show();
+                                break;
+                            default:
+                                UIUtils.customToastMsg(context, "Response body is empty or null.");
+                        }
+                    }
+
+
                 }
             }
 

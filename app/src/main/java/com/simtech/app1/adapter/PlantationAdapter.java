@@ -18,7 +18,7 @@ import com.simtech.app1.pojo.planting.PlantatingVarietyDataPojo;
 
 import java.util.ArrayList;
 
-public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.ViewHolder>{
+public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.ViewHolder> {
     private ArrayList<PlantatingVarietyDataPojo> data;
     private Context context;
     String varietyCodeFromActivity, trialtypename;
@@ -68,19 +68,19 @@ public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.Vi
         holder.etSample2.setText(varietyDataPojo.sample2);
 
         holder.tvVerityCode.setText(varietyCode);
-        holder.tvVerityName.setText(variatyName);
+        /*holder.tvVerityName.setText(variatyName);*/
         holder.tvPurpose.setText(purpose);
 
         varietyDataPojo.sample1 = holder.etSample1.getText().toString();
         varietyDataPojo.sample2 = holder.etSample2.getText().toString();
 
-        if(trialtypename.contains("FastTrack")){
+        /*if (trialtypename.contains("FastTrack")) {
             holder.etSample3.setVisibility(View.GONE);
-        } else {
+        } else {*/
             holder.etSample3.setVisibility(View.VISIBLE);
             holder.etSample3.setText(varietyDataPojo.sample3);
             varietyDataPojo.sample3 = holder.etSample3.getText().toString();
-        }
+        /*}*/
 
         holder.etSample1.addTextChangedListener(new TextWatcher() {
             @Override
@@ -94,6 +94,7 @@ public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.Vi
 
             @Override
             public void afterTextChanged(Editable editable) {
+
                 varietyDataPojo.setSample1(editable.toString());
                 /*if(editDataListener != null){
                     editDataListener.onEditData(varietyDataPojo);
@@ -147,7 +148,8 @@ public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.Vi
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvVerityCode, tvVerityName, tvPurpose;
+        TextView tvVerityCode, /*tvVerityName,*/
+                tvPurpose;
         EditText etSample1, etSample2, etSample3;
 
         RecyclerView rvTrialObservation;
@@ -155,7 +157,7 @@ public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.Vi
         public ViewHolder(View itemView) {
             super(itemView);
             tvVerityCode = itemView.findViewById(R.id.tvVerityCode);
-            tvVerityName = itemView.findViewById(R.id.tvVerityName);
+            /*tvVerityName = itemView.findViewById(R.id.tvVerityName);*/
             tvPurpose = itemView.findViewById(R.id.tvPurpose);
             etSample1 = itemView.findViewById(R.id.etSample1);
             etSample2 = itemView.findViewById(R.id.etSample2);

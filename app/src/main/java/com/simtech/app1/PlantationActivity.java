@@ -14,6 +14,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.simtech.app1.adapter.PlantationAdapter;
@@ -54,6 +55,8 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
     private PlantingPojo plantingResponse;
     private ProgressBar progressBar;
     private LinearLayout lytHeader, linearLayout;
+    private TextView tvNoData;
+    private CardView cardViewLyt1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,6 +106,8 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
         tvSample3 = findViewById(R.id.tvSample3);
         rvPlantation = findViewById(R.id.rvPlantation);
         btnSave = findViewById(R.id.btnSave);
+        tvNoData = findViewById(R.id.tvNoData);
+        cardViewLyt1 = findViewById(R.id.cardViewLyt1);
 
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
@@ -127,7 +132,7 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
     }
 
     private void callInsertPlantingAPI() {
-        showProgressBar();
+        progressBar.setVisibility(View.VISIBLE);
 
         ArrayList<PlantatingVarietyDataPojo> insertPlantationData = plantingResponse.data.get(0).plantation_data;
 
@@ -147,18 +152,30 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
             @Override
             public void onResponse(Call<UserLoginResponse> call, Response<UserLoginResponse> response) {
                 if (response.isSuccessful()) {
-                    hideProgressBar();
                     UserLoginResponse plantingResponse1 = response.body();
-                    Toast.makeText(PlantationActivity.this, plantingResponse1.message, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(PlantationActivity.this, FieldLayoutActivity.class);
-                    intent.putExtra("observationType", observationType);
-                    intent.putExtra("startDate", startDate);
-                    intent.putExtra("locationName", locationName);
-                    intent.putExtra("locationId", locationId);
-                    intent.putExtra("trialTypeId", trialTypeId);
-                    intent.putExtra("trialTypeName", trialTypeName);
-                    intent.putExtra("nReplications", nReplications);
-                    startActivity(intent);
+                    if (plantingResponse1 != null) {
+                        int statusCode = response.code();
+                        switch (statusCode) {
+                            case 200:
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(PlantationActivity.this, plantingResponse1.message, Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(PlantationActivity.this, FieldLayoutActivity.class);
+                                intent.putExtra("observationType", observationType);
+                                intent.putExtra("startDate", startDate);
+                                intent.putExtra("locationName", locationName);
+                                intent.putExtra("locationId", locationId);
+                                intent.putExtra("trialTypeId", trialTypeId);
+                                intent.putExtra("trialTypeName", trialTypeName);
+                                intent.putExtra("nReplications", nReplications);
+                                startActivity(intent);
+                                break;
+                            default:
+                                UIUtils.customToastMsg(PlantationActivity.this, "Unexpected response code: " + statusCode);
+                        }
+                    } else {
+                        // Handle the case where the response body is null
+                        UIUtils.customToastMsg(PlantationActivity.this, "Response body is empty or null.");
+                    }
                 }
             }
 
@@ -170,7 +187,7 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
     }
 
     private void callApi() {
-        showProgressBar();
+        progressBar.setVisibility(View.VISIBLE);
         apiInterface = APIClient.getClient().create(APIInterface.class);
         Call<PlantingPojo> call = apiInterface.planting(userName, startDate, locationName, locationId, trialTypeName, trialTypeId);
         call.enqueue(new Callback<PlantingPojo>() {
@@ -178,34 +195,55 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
             public void onResponse(Call<PlantingPojo> call, Response<PlantingPojo> response) {
                 if (response.isSuccessful()) {
                     plantingResponse = response.body();
-                    if (plantingResponse != null && plantingResponse.data != null && plantingResponse.data.size() != 0) {
-                        plantingResponse.data.get(0).username = userName;
-                        data = plantingResponse.data.get(0);
-                        farmersNameTextView.setText("Farmer's Name: " + data.farmername);
-                        locationTextView.setText("Location: " + data.locationname);
-                        plantingDateTextView.setText("Planting Date: " + data.startdate);
-                        selectedTrialTypeTextView.setText("Trial Type: " + data.trialtypename);
+                    if (plantingResponse != null) {
+                        int statusCode = response.code();
+                        switch (statusCode) {
+                            case 200:
+                                if (plantingResponse.data != null && plantingResponse.data.size() != 0) {
+                                    plantingResponse.data.get(0).username = userName;
+                                    data = plantingResponse.data.get(0);
+                                    farmersNameTextView.setText("Farmer's Name: " + data.farmername);
+                                    locationTextView.setText("Location: " + data.locationname);
+                                    plantingDateTextView.setText("Planting Date: " + data.startdate);
+                                    selectedTrialTypeTextView.setText("Trial Type: " + data.trialtypename);
 
-                        if(data.trialtypename.contains("FastTrack")){
-                            tvSample3.setVisibility(View.GONE);
-                        } else {
-                            tvSample3.setVisibility(View.VISIBLE);
+                                    /*if(data.trialtypename.contains("FastTrack")){
+                                        tvSample3.setVisibility(View.GONE);
+                                    } else {
+                                        tvSample3.setVisibility(View.VISIBLE);
+                                    }*/
+
+                                    if(data.plantation_data.size() != 0 && data.plantation_data !=null){
+                                        tvNoData.setVisibility(View.GONE);
+                                        progressBar.setVisibility(View.GONE);
+                                        rvPlantation.setVisibility(View.VISIBLE);
+                                        lytHeader.setVisibility(View.VISIBLE);
+                                        linearLayout.setVisibility(View.VISIBLE);
+                                        btnSave.setVisibility(View.VISIBLE);
+                                        cardViewLyt1.setVisibility(View.VISIBLE);
+                                        plantationAdapter = new PlantationAdapter(PlantationActivity.this, data.plantation_data, varietyCode, data.trialtypename);
+                                        rvPlantation.setAdapter(plantationAdapter);
+                                        moveItemToLastPosition(0,data.plantation_data);
+                                    } else{
+                                        tvNoData.setVisibility(View.VISIBLE);
+                                        rvPlantation.setVisibility(View.GONE);
+                                        lytHeader.setVisibility(View.GONE);
+                                        linearLayout.setVisibility(View.GONE);
+                                        progressBar.setVisibility(View.GONE);
+                                        btnSave.setVisibility(View.GONE);
+                                        cardViewLyt1.setVisibility(View.GONE);
+                                    }
+                                } else {
+                                    UIUtils.customToastMsg(PlantationActivity.this, "No Data Found AT Planting");
+                                }
+                                break;
+                            default:
+                                // Handle other response codes
+                                UIUtils.customToastMsg(PlantationActivity.this, "Unexpected response code: " + statusCode);
                         }
-                        plantationAdapter = new PlantationAdapter(PlantationActivity.this, data.plantation_data, varietyCode, data.trialtypename);
-                        rvPlantation.setAdapter(plantationAdapter);
-                        moveItemToLastPosition(0,data.plantation_data);
-                        hideProgressBar();
-                        /*int positionToFocus = plantationAdapter.findPositionByItemId(varietyCode);
-
-                        if (positionToFocus != RecyclerView.NO_POSITION) {
-                            // Set the focused position in the adapter
-                            plantationAdapter.setFocusedPosition(positionToFocus);
-
-                            // Smooth scroll to the focused position
-                            rvPlantation.smoothScrollToPosition(positionToFocus);
-                        }*/
                     } else {
-                        UIUtils.customToastMsg(PlantationActivity.this, "No Data Found AT Planting");
+                        // Handle the case where the response body is null
+                        UIUtils.customToastMsg(PlantationActivity.this, "Response body is empty or null.");
                     }
                 }
             }
@@ -222,21 +260,6 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
         plantationData.remove(index);
         plantationData.add(itemToMove);
         plantationAdapter.notifyItemMoved(index, plantationData.size() - 1);
-    }
-
-
-    private void showProgressBar() {
-        progressBar.setVisibility(View.VISIBLE);
-        rvPlantation.setVisibility(View.GONE);
-        lytHeader.setVisibility(View.GONE);
-        linearLayout.setVisibility(View.GONE);
-    }
-
-    private void hideProgressBar() {
-        progressBar.setVisibility(View.GONE);
-        rvPlantation.setVisibility(View.VISIBLE);
-        lytHeader.setVisibility(View.VISIBLE);
-        linearLayout.setVisibility(View.VISIBLE);
     }
 
     @Override

@@ -63,6 +63,7 @@
         android:id="@+id/cardViewLyt1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
         <LinearLayout
             android:id="@+id/lytHeader"
@@ -119,6 +120,7 @@
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:background="@color/a7daac"
+        android:visibility="gone"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -137,7 +139,7 @@
             android:textSize="16sp" />
 
         <!-- Field 2 -->
-        <TextView
+        <!--<TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -145,7 +147,7 @@
             android:gravity="center"
             android:text="Variety Name"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp" />-->
 
         <!-- Field 3 -->
         <TextView
@@ -198,6 +200,26 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_weight="0.58"
+        android:background="@drawable/item_border_green"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btnSave"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+    <TextView
+        android:id="@+id/tvNoData"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="0.58"
+        android:visibility="gone"
+        android:text="No Data Found"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:typeface="serif"
+        android:textStyle="bold"
         android:background="@drawable/item_border_green"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"

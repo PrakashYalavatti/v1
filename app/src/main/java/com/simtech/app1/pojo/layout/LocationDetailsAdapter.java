@@ -32,6 +32,7 @@ public class LocationDetailsAdapter extends RecyclerView.Adapter<LocationDetails
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // Set up nested RecyclerView for purposes
+
         PurposeAdapter purposeAdapter = new PurposeAdapter(context, observationType, data.getPurposes(), data.getStart_date(),
                 data.getLocation_name(), data.getLocation_id(), data.getTrial_type_name(), data.getTrial_type_id(), data.getN_replications(), data.getN_observation_lines());
         LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
