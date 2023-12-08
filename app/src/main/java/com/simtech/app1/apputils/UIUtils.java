@@ -6,8 +6,10 @@ import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -27,6 +29,7 @@ import com.simtech.app1.apiservices.APIInterface;
 import com.simtech.app1.apiservices.apirequestresponse.UserLoginResponse;
 import com.simtech.app1.pojo.dap.DAPPojo;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -157,9 +160,236 @@ public class UIUtils {
         return daysDifference;
     }
 
-    public static void showDialogWithL5(Context context, String observationType, String startDate,
+    public static void showDialogWithL20DAP(Context context, String observationType, String startDate,
                                         String locationId, String trialTypeId, String replicationName, String vatietyCode, String observationLines) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dap_20_30_l1_4, null);
+
+        // Initialize the AlertDialog builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        TextView tvReplication = dialogView.findViewById(R.id.tvReplication);
+        TextView tvVarietyCode = dialogView.findViewById(R.id.tvVarietyCode);
+        tvReplication.setText(replicationName);
+        tvVarietyCode.setText(vatietyCode);
+        builder.setView(dialogView);
+        builder.setCancelable(false);
+
+        // Find the EditText fields in the custom layout
+        TextView tvCanopy = dialogView.findViewById(R.id.tvCanopy);
+        TextView tvL1 = dialogView.findViewById(R.id.tvL1);
+        TextView tvL2 = dialogView.findViewById(R.id.tvL2);
+        TextView tvL3 = dialogView.findViewById(R.id.tvL3);
+        TextView tvL4 = dialogView.findViewById(R.id.tvL4);
+        EditText editTextCanopy = dialogView.findViewById(R.id.editTextCanopy);
+        EditText editTextL1 = dialogView.findViewById(R.id.editTextL1);
+        EditText editTextL2 = dialogView.findViewById(R.id.editTextL2);
+        EditText editTextL3 = dialogView.findViewById(R.id.editTextL3);
+        EditText editTextL4 = dialogView.findViewById(R.id.editTextL4);
+        EditText etRemarks = dialogView.findViewById(R.id.etRemarks);
+
+        editTextL1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.toString().length()>1) {
+                    Double sample1 = Double.valueOf(editable.toString());
+                    if (sample1 <= 25) {
+                        DecimalFormat decimalFormat = new DecimalFormat("##.###");
+                        // Format the number
+                        String sample1Str = decimalFormat.format(sample1);
+                        editTextL1.setText(sample1Str);
+                    } else {
+                        editTextL1.setError("Please enter value below 25");
+                        editTextL1.setText("");
+                    }
+                }
+            }
+        });
+        editTextL2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.toString().length()>1) {
+                    Double sample2 = Double.valueOf(editable.toString());
+                    if (sample2 <= 25) {
+                        DecimalFormat decimalFormat = new DecimalFormat("##.###");
+                        // Format the number
+                        String sample1Str = decimalFormat.format(sample2);
+                        editTextL2.setText(sample1Str);
+                    } else {
+                        editTextL2.setError("Please enter value below 25");
+                        editTextL2.setText("");
+                    }
+                }
+            }
+        });
+
+        editTextL3.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.toString().length()>1) {
+                    Double sample3 = Double.valueOf(editable.toString());
+                    if (sample3 <= 25) {
+                        DecimalFormat decimalFormat = new DecimalFormat("##.###");
+                        // Format the number
+                        String sample1Str = decimalFormat.format(sample3);
+                        editTextL3.setText(sample1Str);
+                    } else {
+                        editTextL3.setError("Please enter value below 25");
+                        editTextL3.setText("");
+                    }
+                }
+            }
+        });
+
+        editTextL4.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.toString().length()>1) {
+                    Double sample4 = Double.valueOf(editable.toString());
+                    if (sample4 <= 25) {
+                        DecimalFormat decimalFormat = new DecimalFormat("##.###");
+                        // Format the number
+                        String sample1Str = decimalFormat.format(sample4);
+                        editTextL4.setText(sample1Str);
+                    } else {
+                        editTextL4.setError("Please enter value below 25");
+                        editTextL4.setText("");
+                    }
+                }
+            }
+        });
+
+        if ((observationType.contains("20 DAP") || observationType.contains("30 DAP")) && (trialTypeId.equalsIgnoreCase("TRL-1"))) {
+            tvCanopy.setVisibility(View.GONE);
+            editTextCanopy.setVisibility(View.GONE);
+        } else if ((observationType.contains("20 DAP") || observationType.contains("30 DAP")) && (trialTypeId.equalsIgnoreCase("TRL-2"))) {
+            tvCanopy.setVisibility(View.GONE);
+            editTextCanopy.setVisibility(View.GONE);
+            tvL3.setVisibility(View.GONE);
+            editTextL3.setVisibility(View.GONE);
+            tvL4.setVisibility(View.GONE);
+            editTextL4.setVisibility(View.GONE);
+        } else if (observationType.contains("45 DAP") && trialTypeId.equalsIgnoreCase("TRL-2")) {
+            tvCanopy.setVisibility(View.VISIBLE);
+            editTextCanopy.setVisibility(View.VISIBLE);
+            tvL3.setVisibility(View.GONE);
+            editTextL3.setVisibility(View.GONE);
+            tvL4.setVisibility(View.GONE);
+            editTextL4.setVisibility(View.GONE);
+        } else if ((observationType.contains("20 DAP") || observationType.contains("30 DAP")) && (trialTypeId.equalsIgnoreCase("TRL-3"))) {
+            tvCanopy.setVisibility(View.GONE);
+            editTextCanopy.setVisibility(View.GONE);
+            tvL4.setVisibility(View.GONE);
+            editTextL4.setVisibility(View.GONE);
+            tvL1.setText("Sample1");
+            tvL2.setText("Sample2");
+            tvL3.setText("Sample3");
+        } else if (observationType.contains("45 DAP") && (trialTypeId.equalsIgnoreCase("TRL-3"))) {
+            tvCanopy.setVisibility(View.VISIBLE);
+            editTextCanopy.setVisibility(View.VISIBLE);
+            tvL4.setVisibility(View.GONE);
+            editTextL4.setVisibility(View.GONE);
+            tvL1.setText("Sample1");
+            tvL2.setText("Sample2");
+            tvL3.setText("Sample3");
+        }
+        // Access the other EditText fields (editText3, editText4, and editText5) as needed
+        builder.setPositiveButton("Save", (dialog, which) -> {
+            // Handle OK button click
+
+            String textCanopy = editTextCanopy.getText().toString();
+            String textL1 = editTextL1.getText().toString();
+            String textL2 = editTextL2.getText().toString();
+            String textL3 = editTextL3.getText().toString();
+            String textL4 = editTextL4.getText().toString();
+            String textRemarks = etRemarks.getText().toString();
+
+            LocalDate date = null;
+            int yearOnly = 0;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                date = LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE);
+                yearOnly = date.getYear();
+            }
+            String observation = "";
+            if(observationType.contains("20 DAP")){
+                observation = "20dap";
+            } else if(observationType.contains("30 DAP")){
+                observation = "30dap";
+            } else if(observationType.contains("45 DAP")){
+                observation = "45dap";
+            }
+            // Create a JSONObject and add key-value pairs
+            DAPPojo dapPojo = new DAPPojo();
+            dapPojo.locationid = locationId;
+            dapPojo.trialtypeid = trialTypeId;
+            dapPojo.trialyear = yearOnly + "";
+            dapPojo.varietycode = vatietyCode;
+            dapPojo.replication = replicationName;
+            dapPojo.l1 = textL1;
+            dapPojo.l2 = textL2;
+            dapPojo.l3 = textL3;
+            dapPojo.l4 = textL4;
+            dapPojo.canopy = textCanopy;
+            dapPojo.remarks = textRemarks;
+            dapPojo.fromdap = observation;
+            if (UIUtils.isNetworkAvailable(context)) {
+                callApiForDapInsertion(context, dapPojo);
+            } else {
+                Toast.makeText(context, context.getString(R.string.data_not_saved_internet), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            // Handle Cancel button click
+            dialog.dismiss();
+        });
+
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public static void showDialogWithL5(Context context, String observationType, String startDate,
+                                        String locationId, String trialTypeId, String replicationName, String vatietyCode, String observationLines) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.dap_45_l1_4, null);
 
         // Initialize the AlertDialog builder
         AlertDialog.Builder builder = new AlertDialog.Builder(context);

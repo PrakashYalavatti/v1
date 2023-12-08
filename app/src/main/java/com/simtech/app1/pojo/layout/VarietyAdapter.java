@@ -74,7 +74,11 @@ public class VarietyAdapter extends RecyclerView.Adapter<VarietyAdapter.ViewHold
                         plantingIntent.putExtra("nReplications", nReplications);
                         plantingIntent.putExtra("varietyCode", vatietyCode);
                         context.startActivity(plantingIntent);
-                    } else if(observationType.contains("20 DAP") || observationType.contains("30 DAP") || observationType.contains("45 DAP")){
+                    } else if(observationType.contains("20 DAP")){
+                        UIUtils.showDialogWithL20DAP(context, observationType, startDate, locationId, trialTypeId, replicationName, vatietyCode, nObservationLines);
+                    } else if(observationType.contains("30 DAP")){
+                        UIUtils.showDialogWithL20DAP(context, observationType, startDate, locationId, trialTypeId, replicationName, vatietyCode, nObservationLines);
+                    } else if(observationType.contains("45 DAP")){
                         UIUtils.showDialogWithL5(context, observationType, startDate, locationId, trialTypeId, replicationName, vatietyCode, nObservationLines);
                     }
                 }else {
