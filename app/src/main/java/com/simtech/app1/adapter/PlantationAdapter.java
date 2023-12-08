@@ -16,6 +16,7 @@ import com.simtech.app1.EditPlantingSamples;
 import com.simtech.app1.R;
 import com.simtech.app1.pojo.planting.PlantatingVarietyDataPojo;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.ViewHolder> {
@@ -94,11 +95,18 @@ public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.Vi
 
             @Override
             public void afterTextChanged(Editable editable) {
-
-                varietyDataPojo.setSample1(editable.toString());
-                /*if(editDataListener != null){
-                    editDataListener.onEditData(varietyDataPojo);
-                }*/
+                if (editable.toString().length()>1) {
+                    Double sample1 = Double.valueOf(editable.toString());
+                    if (sample1 <= 16) {
+                        DecimalFormat decimalFormat = new DecimalFormat("##.###");
+                        // Format the number
+                        String sample1Str = decimalFormat.format(sample1);
+                        varietyDataPojo.setSample1(sample1Str);
+                    } else {
+                        holder.etSample1.setError("Please enter value below 16");
+                        holder.etSample1.setText("");
+                    }
+                }
             }
         });
 
@@ -114,10 +122,18 @@ public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.Vi
 
             @Override
             public void afterTextChanged(Editable editable) {
-                varietyDataPojo.setSample2(editable.toString());
-                /*if(editDataListener != null){
-                    editDataListener.onEditData(varietyDataPojo);
-                }*/
+                if (editable.toString().length()>1) {
+                    Double sample2 = Double.valueOf(editable.toString());
+                    if (sample2 <= 16) {
+                        DecimalFormat decimalFormat = new DecimalFormat("##.###");
+                        // Format the number
+                        String sample1Str = decimalFormat.format(sample2);
+                        varietyDataPojo.setSample1(sample1Str);
+                    } else {
+                        holder.etSample1.setError("Please enter value below 16");
+                        holder.etSample1.setText("");
+                    }
+                }
             }
         });
 
@@ -133,10 +149,18 @@ public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.Vi
 
             @Override
             public void afterTextChanged(Editable editable) {
-                varietyDataPojo.setSample3(editable.toString());
-                /*if(editDataListener != null){
-                    editDataListener.onEditData(varietyDataPojo);
-                }*/
+                if (editable.toString().length()>1) {
+                    Double sample3 = Double.valueOf(editable.toString());
+                    if (sample3 <= 16) {
+                        DecimalFormat decimalFormat = new DecimalFormat("##.###");
+                        // Format the number
+                        String sample1Str = decimalFormat.format(sample3);
+                        varietyDataPojo.setSample1(sample1Str);
+                    } else {
+                        holder.etSample1.setError("Please enter value below 16");
+                        holder.etSample1.setText("");
+                    }
+                }
             }
         });
 
