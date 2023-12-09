@@ -31,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 
+import com.google.gson.Gson;
 import com.simtech.app1.apiservices.APIClient;
 import com.simtech.app1.apiservices.APIInterface;
 import com.simtech.app1.apiservices.apirequestresponse.UserLoginRequest;
@@ -143,6 +144,18 @@ public class LoginActivity extends AppCompatActivity {
                 if ((!TextUtils.isEmpty(strUserName) || !strUserName.equals("")) && (!TextUtils.isEmpty(strUserPassword) || !strUserPassword.equals(""))) {
                     if(UIUtils.isNetworkAvailable(LoginActivity.this)){
                         loginApiCall(strUserName, strUserPassword);
+
+                        /*String jsonString = "{ \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjAxMjEzOCwianRpIjoiMTk1YzgyOGMtMDEwMi00ZDUxLWFiNjgtYmIwMmU3MmZiOTM1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiYyIsIm5iZiI6MTcwMjAxMjEzOCwiZXhwIjoxNzAyMDEzMDM4fQ.RKX4iAz1B_i0uMh5nCLTmrqVyYIgaUZmrCyotyMAuBI\", \"message\": \"Login successful\", \"status\": \"1\" }";;
+                        UserLoginResponse response = parseJsonToAccessTokenResponse(jsonString);
+                        mCredentialsStorage = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                        SharedPreferences.Editor editor = mCredentialsStorage.edit();
+                        editor.putString(TOKEN, response.getAccess_token());
+                        editor.putString(USERNAME, "shivani");
+                        editor.putString(PASSWORD, "123456");
+                        editor.commit();
+                        Intent intent = new Intent(LoginActivity.this, MainMenuActivity.class);
+                        startActivity(intent);*/
+
                     } else {
                         Toast.makeText(LoginActivity.this, getString(R.string.internet_connection), Toast.LENGTH_SHORT).show();
                     }
@@ -164,6 +177,11 @@ public class LoginActivity extends AppCompatActivity {
         };
 
         LoginActivity.this.getOnBackPressedDispatcher().addCallback(LoginActivity.this, callback);*/
+    }
+
+    private UserLoginResponse parseJsonToAccessTokenResponse(String jsonResponse) {
+        Gson gson = new Gson();
+        return gson.fromJson(jsonResponse, UserLoginResponse.class);
     }
 
     private void loginApiCall(String strUserName, String strUserPassword) {

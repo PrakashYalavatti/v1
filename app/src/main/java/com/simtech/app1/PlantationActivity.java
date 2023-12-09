@@ -17,9 +17,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.simtech.app1.adapter.PlantationAdapter;
 import com.simtech.app1.apiservices.APIClient;
 import com.simtech.app1.apiservices.APIInterface;
+import com.simtech.app1.apiservices.apirequestresponse.MainMenuResponse;
 import com.simtech.app1.apiservices.apirequestresponse.UserLoginResponse;
 import com.simtech.app1.apputils.UIUtils;
 import com.simtech.app1.pojo.RVChildItem;
@@ -36,7 +38,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PlantationActivity extends AppCompatActivity implements EditPlantingSamples{
+public class PlantationActivity extends AppCompatActivity implements EditPlantingSamples {
     private int observation;
     private ArrayList<RVParentItem> parentItemList;
 
@@ -122,7 +124,7 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(UIUtils.isNetworkAvailable(PlantationActivity.this)){
+                if (UIUtils.isNetworkAvailable(PlantationActivity.this)) {
                     callInsertPlantingAPI();
                 } else {
                     Toast.makeText(PlantationActivity.this, getString(R.string.internet_connection), Toast.LENGTH_SHORT).show();
@@ -140,10 +142,10 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
 
         while (iterator.hasNext()) {
             PlantatingVarietyDataPojo dataPojo = iterator.next();
-            if(dataPojo.sample1==null && dataPojo.sample2 == null && dataPojo.sample3 == null) {
+            if (dataPojo.sample1 == null && dataPojo.sample2 == null && dataPojo.sample3 == null) {
                 iterator.remove();
-            } else if(dataPojo.sample1!=null && dataPojo.sample2!=null && dataPojo.sample3 == null){
-                dataPojo.sample3="";
+            } else if (dataPojo.sample1 != null && dataPojo.sample2 != null && dataPojo.sample3 == null) {
+                dataPojo.sample3 = "";
             }
         }
 
@@ -213,7 +215,7 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
                                         tvSample3.setVisibility(View.VISIBLE);
                                     }*/
 
-                                    if(data.plantation_data.size() != 0 && data.plantation_data !=null){
+                                    if (data.plantation_data.size() != 0 && data.plantation_data != null) {
                                         tvNoData.setVisibility(View.GONE);
                                         progressBar.setVisibility(View.GONE);
                                         rvPlantation.setVisibility(View.VISIBLE);
@@ -223,8 +225,8 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
                                         cardViewLyt1.setVisibility(View.VISIBLE);
                                         plantationAdapter = new PlantationAdapter(PlantationActivity.this, data.plantation_data, varietyCode, data.trialtypename);
                                         rvPlantation.setAdapter(plantationAdapter);
-                                        moveItemToLastPosition(0,data.plantation_data);
-                                    } else{
+                                        moveItemToLastPosition(0, data.plantation_data);
+                                    } else {
                                         tvNoData.setVisibility(View.VISIBLE);
                                         rvPlantation.setVisibility(View.GONE);
                                         lytHeader.setVisibility(View.GONE);
@@ -270,10 +272,52 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
     @Override
     protected void onResume() {
         super.onResume();
-        if(UIUtils.isNetworkAvailable(PlantationActivity.this)){
+        if (UIUtils.isNetworkAvailable(PlantationActivity.this)) {
             callApi();
+            /*String jsonString = "{ \"data\": [ { \"farmername\": \"Amruta\", \"locationid\": \"LOC-25\", \"locationname\": \"Hubballi\", \"plantation_data\": [ { \"purpose\": \"Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5012\", \"varietyname\": \"K.Pukhraj\" }, { \"purpose\": \"Crisp\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5036\", \"varietyname\": \"L.R\" }, { \"purpose\": \"Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5190\", \"varietyname\": \"Tribute\" }, { \"purpose\": \"Table/Baker\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5191\", \"varietyname\": \"Reiver\" }, { \"purpose\": \"Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5192\", \"varietyname\": \"Sorrento\" }, { \"purpose\": \"Low GI/Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5193\", \"varietyname\": \"Pioneer\" }, { \"purpose\": \"Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5195\", \"varietyname\": \"ElMundo\" }, { \"purpose\": \"Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5196\", \"varietyname\": \"Everest\" }, { \"purpose\": \"Crisp/Purple flash with cream skin\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5200\", \"varietyname\": \"Tr 2015 -138\" }, { \"purpose\": \"Crisp\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5201\", \"varietyname\": \"Cr 2002-1\" }, { \"purpose\": \"Table/R in R\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5204\", \"varietyname\": \"Cr 2015-097\" }, { \"purpose\": \"Table/Crisp\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5211\", \"varietyname\": \"10.Z.342 A 5\" }, { \"purpose\": \"Table/Crisp\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5212\", \"varietyname\": \"10.Z.353 A 7\" }, { \"purpose\": \"Table/Crisp\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5213\", \"varietyname\": \"10.Z.380 A 3\" }, { \"purpose\": \"Table/Baker\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5214\", \"varietyname\": \"10.Z.381 A 3\" }, { \"purpose\": \"Table/Baker\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5215\", \"varietyname\": \"07.Z.31 C 21\" }, { \"purpose\": \"Table/Baker\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5216\", \"varietyname\": \"07.Z.21 A 12\" }, { \"purpose\": \"Low GI Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5217\", \"varietyname\": \"10.MRS.56 A 21\" }, { \"purpose\": \"Low GI Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5218\", \"varietyname\": \"10.MRS.2 A 9\" }, { \"purpose\": \"Crisp\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5219\", \"varietyname\": \"11.MRS.26 A 2\" }, { \"purpose\": \"Crisp/Low GI\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5220\", \"varietyname\": \"04.PD.2 A 7\" }, { \"purpose\": \"Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5221\", \"varietyname\": \"03.MT.78 A 4\" } ], \"startdate\": \"2023-12-08\", \"state\": \"Karnataka\", \"stateid\": \"KA\", \"trialtypeid\": \"TRL-2\", \"trialtypename\": \"FastTrack PET\", \"trialyear\": \"2023\", \"username\": \"abc\" } ] }";
+            PlantingPojo plantingResponse = parseJsonToAccessTokenResponse(jsonString);
+            if (plantingResponse.data != null && plantingResponse.data.size() != 0) {
+                plantingResponse.data.get(0).username = userName;
+                data = plantingResponse.data.get(0);
+                farmersNameTextView.setText("Farmer's Name: " + data.farmername);
+                locationTextView.setText("Location: " + data.locationname);
+                plantingDateTextView.setText("Planting Date: " + data.startdate);
+                selectedTrialTypeTextView.setText("Trial Type: " + data.trialtypename);
+
+                                    *//*if(data.trialtypename.contains("FastTrack")){
+                                        tvSample3.setVisibility(View.GONE);
+                                    } else {
+                                        tvSample3.setVisibility(View.VISIBLE);
+                                    }*//*
+
+                if (data.plantation_data.size() != 0 && data.plantation_data != null) {
+                    tvNoData.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.GONE);
+                    rvPlantation.setVisibility(View.VISIBLE);
+                    lytHeader.setVisibility(View.VISIBLE);
+                    linearLayout.setVisibility(View.VISIBLE);
+                    btnSave.setVisibility(View.VISIBLE);
+                    cardViewLyt1.setVisibility(View.VISIBLE);
+                    plantationAdapter = new PlantationAdapter(PlantationActivity.this, data.plantation_data, varietyCode, data.trialtypename);
+                    rvPlantation.setAdapter(plantationAdapter);
+                    moveItemToLastPosition(0, data.plantation_data);
+                } else {
+                    tvNoData.setVisibility(View.VISIBLE);
+                    rvPlantation.setVisibility(View.GONE);
+                    lytHeader.setVisibility(View.GONE);
+                    linearLayout.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.GONE);
+                    btnSave.setVisibility(View.GONE);
+                    cardViewLyt1.setVisibility(View.GONE);
+                }
+            }*/
         } else {
             Toast.makeText(PlantationActivity.this, getString(R.string.internet_connection), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private PlantingPojo parseJsonToAccessTokenResponse(String jsonResponse) {
+        Gson gson = new Gson();
+        return gson.fromJson(jsonResponse, PlantingPojo.class);
     }
 }

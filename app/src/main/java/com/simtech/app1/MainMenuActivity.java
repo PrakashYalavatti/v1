@@ -14,10 +14,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.simtech.app1.adapter.MainMenuAdapter;
 import com.simtech.app1.apiservices.APIClient;
 import com.simtech.app1.apiservices.APIInterface;
 import com.simtech.app1.apiservices.apirequestresponse.MainMenuResponse;
+import com.simtech.app1.apiservices.apirequestresponse.UserLoginResponse;
 import com.simtech.app1.apputils.UIUtils;
 
 import retrofit2.Call;
@@ -128,9 +130,19 @@ public class MainMenuActivity extends AppCompatActivity {
         if(UIUtils.isNetworkAvailable(MainMenuActivity.this)) {
             showProgressBar();
             callMainMenuAPI();
+            /*String jsonString = "{ \"data\": [ { \"locationid\": \"LOC-24\", \"locationname\": \"Bangaluru\", \"startdate\": \"2023-10-24\", \"trialtype\": [ { \"trialstatus\": \"00 days for 30 DAP \", \"trialtypeid\": \"TRL-2\", \"trialtypename\": \"FastTrack PET\" }, { \"trialstatus\": \"00 days for 30 DAP \", \"trialtypeid\": \"TRL-3\", \"trialtypename\": \"CT\" }, { \"trialstatus\": \"00 days for 30 DAP \", \"trialtypeid\": \"TRL-1\", \"trialtypename\": \"Regular PET\" } ], \"username\": \"abc\" }, { \"locationid\": \"LOC-25\", \"locationname\": \"Hubballi\", \"startdate\": \"2023-12-08\", \"trialtype\": [ { \"trialstatus\": \"00 days for Planting \", \"trialtypeid\": \"TRL-1\", \"trialtypename\": \"Regular PET\" }, { \"trialstatus\": \"00 days for Planting \", \"trialtypeid\": \"TRL-2\", \"trialtypename\": \"FastTrack PET\" }, { \"trialstatus\": \"00 days for Planting \", \"trialtypeid\": \"TRL-3\", \"trialtypename\": \"CT\" } ], \"username\": \"abc\" }, { \"locationid\": \"LOC-23\", \"locationname\": \"Chikkaballapura\", \"startdate\": \"2023-11-28\", \"trialtype\": [ { \"trialstatus\": \"10 days for 20 DAP \", \"trialtypeid\": \"TRL-1\", \"trialtypename\": \"Regular PET\" }, { \"trialstatus\": \"10 days for 20 DAP \", \"trialtypeid\": \"TRL-2\", \"trialtypename\": \"FastTrack PET\" }, { \"trialstatus\": \"10 days for 20 DAP \", \"trialtypeid\": \"TRL-3\", \"trialtypename\": \"CT\" } ], \"username\": \"abc\" }, { \"locationid\": \"LOC-26\", \"locationname\": \"Gadag\", \"startdate\": \"2023-10-14\", \"trialtype\": [ { \"trialstatus\": \"35 days for Harvest \", \"trialtypeid\": \"TRL-3\", \"trialtypename\": \"CT\" }, { \"trialstatus\": \"35 days for Harvest \", \"trialtypeid\": \"TRL-1\", \"trialtypename\": \"Regular PET\" }, { \"trialstatus\": \"35 days for Harvest \", \"trialtypeid\": \"TRL-2\", \"trialtypename\": \"FastTrack PET\" } ], \"username\": \"abc\" } ] }";
+            MainMenuResponse response = parseJsonToAccessTokenResponse(jsonString);
+            hideProgressBar();
+            MainMenuAdapter mainMenuAdapter = new MainMenuAdapter(response.getData(), MainMenuActivity.this);
+            rvDashboard.setAdapter(mainMenuAdapter);*/
         } else {
             Toast.makeText(MainMenuActivity.this, getString(R.string.internet_connection), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private MainMenuResponse parseJsonToAccessTokenResponse(String jsonResponse) {
+        Gson gson = new Gson();
+        return gson.fromJson(jsonResponse, MainMenuResponse.class);
     }
 }
 

@@ -38,11 +38,13 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.Task;
+import com.google.gson.Gson;
 import com.simtech.app1.LoginActivity;
 import com.simtech.app1.MainMenuActivity;
 import com.simtech.app1.R;
 import com.simtech.app1.apiservices.APIClient;
 import com.simtech.app1.apiservices.APIInterface;
+import com.simtech.app1.apiservices.apirequestresponse.UserLoginResponse;
 import com.simtech.app1.apputils.UIUtils;
 
 import java.util.ArrayList;
@@ -360,11 +362,56 @@ public class FieldLayoutActivity extends AppCompatActivity implements View.OnCli
         captureGps();
         if (UIUtils.isNetworkAvailable(FieldLayoutActivity.this)) {
             callLayoutAPI();
+            /*String jsonString = "{ \"data\": [ { \"farmer_name\": \"Amruta\", \"location_id\": \"LOC-25\", \"location_name\": \"Hubballi\", \"n_observation_lines\": \"4\", \"n_replications\": \"3\", \"purposes\": [ { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5012\", \"varietyname\": \"K.Pukhraj\" }, { \"observedvalue\": null, \"varietycode\": \"5190\", \"varietyname\": \"Tribute\" }, { \"observedvalue\": null, \"varietycode\": \"5192\", \"varietyname\": \"Sorrento\" }, { \"observedvalue\": null, \"varietycode\": \"5195\", \"varietyname\": \"ElMundo\" }, { \"observedvalue\": null, \"varietycode\": \"5196\", \"varietyname\": \"Everest\" }, { \"observedvalue\": null, \"varietycode\": \"5221\", \"varietyname\": \"03.MT.78 A 4\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5012\", \"varietyname\": \"K.Pukhraj\" }, { \"observedvalue\": null, \"varietycode\": \"5190\", \"varietyname\": \"Tribute\" }, { \"observedvalue\": null, \"varietycode\": \"5192\", \"varietyname\": \"Sorrento\" }, { \"observedvalue\": null, \"varietycode\": \"5195\", \"varietyname\": \"ElMundo\" }, { \"observedvalue\": null, \"varietycode\": \"5196\", \"varietyname\": \"Everest\" }, { \"observedvalue\": null, \"varietycode\": \"5221\", \"varietyname\": \"03.MT.78 A 4\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5012\", \"varietyname\": \"K.Pukhraj\" }, { \"observedvalue\": null, \"varietycode\": \"5190\", \"varietyname\": \"Tribute\" }, { \"observedvalue\": null, \"varietycode\": \"5192\", \"varietyname\": \"Sorrento\" }, { \"observedvalue\": null, \"varietycode\": \"5195\", \"varietyname\": \"ElMundo\" }, { \"observedvalue\": null, \"varietycode\": \"5196\", \"varietyname\": \"Everest\" }, { \"observedvalue\": null, \"varietycode\": \"5221\", \"varietyname\": \"03.MT.78 A 4\" } ] } ], \"purpose\": \"Table\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5036\", \"varietyname\": \"L.R\" }, { \"observedvalue\": null, \"varietycode\": \"5201\", \"varietyname\": \"Cr 2002-1\" }, { \"observedvalue\": null, \"varietycode\": \"5219\", \"varietyname\": \"11.MRS.26 A 2\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5036\", \"varietyname\": \"L.R\" }, { \"observedvalue\": null, \"varietycode\": \"5201\", \"varietyname\": \"Cr 2002-1\" }, { \"observedvalue\": null, \"varietycode\": \"5219\", \"varietyname\": \"11.MRS.26 A 2\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5036\", \"varietyname\": \"L.R\" }, { \"observedvalue\": null, \"varietycode\": \"5201\", \"varietyname\": \"Cr 2002-1\" }, { \"observedvalue\": null, \"varietycode\": \"5219\", \"varietyname\": \"11.MRS.26 A 2\" } ] } ], \"purpose\": \"Crisp\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5191\", \"varietyname\": \"Reiver\" }, { \"observedvalue\": null, \"varietycode\": \"5214\", \"varietyname\": \"10.Z.381 A 3\" }, { \"observedvalue\": null, \"varietycode\": \"5215\", \"varietyname\": \"07.Z.31 C 21\" }, { \"observedvalue\": null, \"varietycode\": \"5216\", \"varietyname\": \"07.Z.21 A 12\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5191\", \"varietyname\": \"Reiver\" }, { \"observedvalue\": null, \"varietycode\": \"5214\", \"varietyname\": \"10.Z.381 A 3\" }, { \"observedvalue\": null, \"varietycode\": \"5215\", \"varietyname\": \"07.Z.31 C 21\" }, { \"observedvalue\": null, \"varietycode\": \"5216\", \"varietyname\": \"07.Z.21 A 12\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5191\", \"varietyname\": \"Reiver\" }, { \"observedvalue\": null, \"varietycode\": \"5214\", \"varietyname\": \"10.Z.381 A 3\" }, { \"observedvalue\": null, \"varietycode\": \"5215\", \"varietyname\": \"07.Z.31 C 21\" }, { \"observedvalue\": null, \"varietycode\": \"5216\", \"varietyname\": \"07.Z.21 A 12\" } ] } ], \"purpose\": \"Table/Baker\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5193\", \"varietyname\": \"Pioneer\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5193\", \"varietyname\": \"Pioneer\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5193\", \"varietyname\": \"Pioneer\" } ] } ], \"purpose\": \"Low GI/Table\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5200\", \"varietyname\": \"Tr 2015 -138\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5200\", \"varietyname\": \"Tr 2015 -138\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5200\", \"varietyname\": \"Tr 2015 -138\" } ] } ], \"purpose\": \"Crisp/Purple flash with cream skin\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5204\", \"varietyname\": \"Cr 2015-097\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5204\", \"varietyname\": \"Cr 2015-097\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5204\", \"varietyname\": \"Cr 2015-097\" } ] } ], \"purpose\": \"Table/R in R\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5211\", \"varietyname\": \"10.Z.342 A 5\" }, { \"observedvalue\": null, \"varietycode\": \"5212\", \"varietyname\": \"10.Z.353 A 7\" }, { \"observedvalue\": null, \"varietycode\": \"5213\", \"varietyname\": \"10.Z.380 A 3\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5211\", \"varietyname\": \"10.Z.342 A 5\" }, { \"observedvalue\": null, \"varietycode\": \"5212\", \"varietyname\": \"10.Z.353 A 7\" }, { \"observedvalue\": null, \"varietycode\": \"5213\", \"varietyname\": \"10.Z.380 A 3\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5211\", \"varietyname\": \"10.Z.342 A 5\" }, { \"observedvalue\": null, \"varietycode\": \"5212\", \"varietyname\": \"10.Z.353 A 7\" }, { \"observedvalue\": null, \"varietycode\": \"5213\", \"varietyname\": \"10.Z.380 A 3\" } ] } ], \"purpose\": \"Table/Crisp\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5217\", \"varietyname\": \"10.MRS.56 A 21\" }, { \"observedvalue\": null, \"varietycode\": \"5218\", \"varietyname\": \"10.MRS.2 A 9\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5217\", \"varietyname\": \"10.MRS.56 A 21\" }, { \"observedvalue\": null, \"varietycode\": \"5218\", \"varietyname\": \"10.MRS.2 A 9\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5217\", \"varietyname\": \"10.MRS.56 A 21\" }, { \"observedvalue\": null, \"varietycode\": \"5218\", \"varietyname\": \"10.MRS.2 A 9\" } ] } ], \"purpose\": \"Low GI Table\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5220\", \"varietyname\": \"04.PD.2 A 7\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5220\", \"varietyname\": \"04.PD.2 A 7\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5220\", \"varietyname\": \"04.PD.2 A 7\" } ] } ], \"purpose\": \"Crisp/Low GI\" } ], \"start_date\": \"2023-12-08\", \"state\": \"Karnataka\", \"state_id\": \"KA\", \"trial_type_id\": \"TRL-1\", \"trial_type_name\": \"Regular PET\", \"trial_year\": \"2023\" } ] }";
+            LayoutDetailsPojo mainMenuResponse = parseJsonToAccessTokenResponse(jsonString);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(FieldLayoutActivity.this);
+            if (mainMenuResponse.getData().size() != 0 && mainMenuResponse.getData() != null) {
+                LocationDetailsDataPojo data = mainMenuResponse.getData().get(0);
+                if(data != null){
+                    progressBar.setVisibility(View.GONE);
+                    tvNoData.setVisibility(View.GONE);
+                    lytHeader.setVisibility(View.VISIBLE);
+                    String farmerName = data.getFarmer_name();
+                    String locationName = data.getLocation_name();
+                    String plantingDate = data.getStart_date();
+                    String nRelications = data.getN_replications();
+                    String nObservationLine = data.getN_observation_lines();
+
+                    farmersNameTextView.setText("Farmer's Name: " + farmerName);
+                    locationTextView.setText("Location: " + locationName);
+                    plantingDateTextView.setText("Planting Date: " + plantingDate);
+                    selectedTrialTextView.setText("Trial Type: " + trialTypeName);
+                    if(data.getPurposes() != null && data.getPurposes().size() != 0){
+                        ArrayList<ObservationPojo> pojoData = data.getPurposes().get(0).getObservations();
+                        if(pojoData != null && pojoData.size() != 0){
+                            ParentRecyclerViewItem.setVisibility(View.VISIBLE);
+                            lytHeader.setVisibility(View.VISIBLE);
+                            cardViewLyt1.setVisibility(View.VISIBLE);
+                            LocationDetailsAdapter parentItemAdapter = new LocationDetailsAdapter(FieldLayoutActivity.this, observationType, data);
+                            ParentRecyclerViewItem.setAdapter(parentItemAdapter);
+                            ParentRecyclerViewItem.setLayoutManager(layoutManager);
+                        }
+                    }
+                } else {
+                    cardViewLyt1.setVisibility(View.GONE);
+                    tvNoData.setVisibility(View.VISIBLE);
+                    lytHeader.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.GONE);
+                }
+            } else {
+                UIUtils.customToastMsg(FieldLayoutActivity.this, "No data Found");
+                progressBar.setVisibility(View.GONE);
+                tvNoData.setVisibility(View.VISIBLE);
+            }*/
         } else {
             Toast.makeText(FieldLayoutActivity.this, getString(R.string.internet_connection), Toast.LENGTH_SHORT).show();
         }
     }
 
+    private LayoutDetailsPojo parseJsonToAccessTokenResponse(String jsonResponse) {
+        Gson gson = new Gson();
+        return gson.fromJson(jsonResponse, LayoutDetailsPojo.class);
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
