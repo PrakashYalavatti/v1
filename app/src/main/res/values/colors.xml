@@ -12,4 +12,5 @@
         <color name="transparent">#00000000</color>
         <color name="a7daac">#a7daac</color>
         <color name="app_color1">#0ca75a</color>
-    </resources>
+    <color name="red">#FF0000</color>
+</resources>

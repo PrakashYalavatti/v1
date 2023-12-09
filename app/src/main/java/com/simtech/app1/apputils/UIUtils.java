@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -186,6 +187,8 @@ public class UIUtils {
         EditText editTextL3 = dialogView.findViewById(R.id.editTextL3);
         EditText editTextL4 = dialogView.findViewById(R.id.editTextL4);
         EditText etRemarks = dialogView.findViewById(R.id.etRemarks);
+
+        editTextL1.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         editTextL1.addTextChangedListener(new TextWatcher() {
             @Override
