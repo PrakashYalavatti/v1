@@ -2,8 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:minHeight="40dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No. of Stems at 45 Days"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -65,7 +81,7 @@
             android:layout_weight="1.2"
             android:baselineAligned="false"
             android:gravity="center"
-            android:text="Canopy Status\n(50%/75%/100%)"
+            android:text="Canopy Status"
             android:textColor="@color/black"
             android:textSize="16sp" />
 
@@ -120,15 +136,14 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/editTextCanopy"
+        <Spinner
+            android:id="@+id/spinnerCanopy"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1.2"
-            android:background="@android:drawable/editbox_background"
             android:inputType="number"
-            android:maxLength="2"
-            android:padding="10dp"
+            android:background="@android:drawable/editbox_background"
+            android:maxLength="4"
             android:textColor="@color/black"
             android:textSize="16sp" />
 
@@ -139,7 +154,7 @@
             android:layout_weight="1"
             android:background="@android:drawable/editbox_background"
             android:inputType="number"
-            android:maxLength="4"
+            android:maxLength="3"
             android:padding="10dp"
             android:textColor="@color/black"
             android:textSize="16sp" />
@@ -151,7 +166,7 @@
             android:layout_weight="1"
             android:background="@android:drawable/editbox_background"
             android:inputType="number"
-            android:maxLength="4"
+            android:maxLength="3"
             android:padding="10dp"
             android:textColor="@color/black"
             android:textSize="16sp" />
@@ -163,7 +178,7 @@
             android:layout_weight="1"
             android:background="@android:drawable/editbox_background"
             android:inputType="number"
-            android:maxLength="4"
+            android:maxLength="3"
             android:padding="10dp"
             android:textColor="@color/black"
             android:textSize="16sp" />
@@ -176,7 +191,7 @@
             android:layout_weight="1"
             android:background="@android:drawable/editbox_background"
             android:inputType="number"
-            android:maxLength="4"
+            android:maxLength="3"
             android:padding="10dp"
             android:textColor="@color/black"
             android:textSize="16sp" />

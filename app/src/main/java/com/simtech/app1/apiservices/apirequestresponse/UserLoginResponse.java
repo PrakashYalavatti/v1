@@ -10,6 +10,9 @@ public class UserLoginResponse {
     @SerializedName("message")
     public String message;
 
+    @SerializedName("datetime")
+    public String datetime;
+
     public int getStatus() {
         return status;
     }

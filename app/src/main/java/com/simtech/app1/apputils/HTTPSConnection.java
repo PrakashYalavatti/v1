@@ -2,8 +2,6 @@ package com.simtech.app1.apputils;
 
 import android.util.Log;
 
-import org.apache.http.conn.ssl.SSLSocketFactory;
-
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -14,7 +12,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-public class RSPHTTPSConnection {
+public class HTTPSConnection {
     public final static HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
         public boolean verify(String hostname, SSLSession session) {
             return true;

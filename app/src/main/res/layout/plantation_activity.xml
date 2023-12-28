@@ -49,9 +49,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
                 android:layout_marginEnd="9dp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/textView2"
-                android:visibility="gone"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/sync_24" />
 
@@ -63,14 +63,15 @@
         android:id="@+id/cardViewLyt1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+
         <LinearLayout
             android:id="@+id/lytHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/farmersNameTextView"
@@ -112,6 +113,43 @@
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/ppTextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/ppEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:hint="Enter P * P" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/rrTextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/rrEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:hint="Enter R * R" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
@@ -120,11 +158,11 @@
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:background="@color/a7daac"
-        android:visibility="visible"
         android:orientation="horizontal"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/rvPlantation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/rvPlantation"
         app:layout_constraintTop_toBottomOf="@+id/cardViewLyt1">
 
         <!-- Field 1 -->
@@ -167,9 +205,11 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:orientation="vertical">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -179,9 +219,11 @@
                     android:textColor="@color/red"
                     android:textSize="14sp" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -227,9 +269,9 @@
         android:background="@drawable/item_border_green"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btnSave"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/btnSave"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
     <TextView
@@ -237,19 +279,19 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_weight="0.58"
-        android:visibility="gone"
-        android:text="No Data Found"
-        android:textSize="16sp"
-        android:textColor="@color/black"
-        android:gravity="center"
-        android:typeface="serif"
-        android:textStyle="bold"
         android:background="@drawable/item_border_green"
+        android:gravity="center"
+        android:text="No Data Found"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:typeface="serif"
+        android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btnSave"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/btnSave"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
     <ProgressBar
@@ -257,13 +299,13 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_centerInParent="true"
+        android:background="@android:color/transparent"
         android:foregroundGravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        android:background="@android:color/transparent"/>
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
     <Button
         android:id="@+id/btnSave"

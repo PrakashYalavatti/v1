@@ -63,7 +63,7 @@ public class VarietyAdapter extends RecyclerView.Adapter<VarietyAdapter.ViewHold
             public void onClick(View v) {
                 if(UIUtils.isNetworkAvailable(context)){
                     // Need to add the condition for Observation type whether it is planting, 20DAP, 30DAP or 45DAP
-                    if (observationType.equalsIgnoreCase(context.getString(R.string.at_planting)) || observationType.contains("Harvest")) {
+                    if (observationType.equalsIgnoreCase(context.getString(R.string.at_planting))) {
                         Intent plantingIntent = new Intent(context, PlantationActivity.class);
                         plantingIntent.putExtra("observationType", observationType);
                         plantingIntent.putExtra("startDate", startDate);
@@ -80,6 +80,8 @@ public class VarietyAdapter extends RecyclerView.Adapter<VarietyAdapter.ViewHold
                         UIUtils.showDialogWithL20DAP(context, observationType, startDate, locationId, trialTypeId, replicationName, vatietyCode, nObservationLines);
                     } else if(observationType.contains("45 DAP")){
                         UIUtils.showDialogWithL5(context, observationType, startDate, locationId, trialTypeId, replicationName, vatietyCode, nObservationLines);
+                    } else if(observationType.contains("Harvest")){
+                        UIUtils.showDialogForHarvest(context, observationType, startDate, locationId, trialTypeId, replicationName, vatietyCode, nObservationLines);
                     }
                 }else {
                     Toast.makeText(context, context.getString(R.string.internet_connection), Toast.LENGTH_SHORT).show();

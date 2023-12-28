@@ -13,4 +13,9 @@
     <string name="data_not_saved_internet">Data not saved...!\nPlease enable internet Connection...</string>
     <string name="gps_switch_on">Please switch on GPS</string>
     <string name="gps_not_captured">GPS not captured, please try again</string>
+    <string name="time_diff">"Difference between server time and device time is more than "</string>
+    <string name="capture_GPS">Capture GPS</string>
+    <string name="no_data_found">No Data Found</string>
+    <string name="harvest">Harvest</string>
+    <string name="cook_test">Cook Test</string>
 </resources>

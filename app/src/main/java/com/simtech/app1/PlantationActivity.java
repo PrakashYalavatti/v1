@@ -3,14 +3,20 @@ package com.simtech.app1;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -59,6 +65,7 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
     private LinearLayout lytHeader, linearLayout;
     private TextView tvNoData;
     private CardView cardViewLyt1;
+    private EditText ppEditText, rrEditText;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -110,6 +117,8 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
         btnSave = findViewById(R.id.btnSave);
         tvNoData = findViewById(R.id.tvNoData);
         cardViewLyt1 = findViewById(R.id.cardViewLyt1);
+        ppEditText = findViewById(R.id.ppEditText);
+        rrEditText = findViewById(R.id.rrEditText);
 
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
@@ -135,9 +144,12 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
 
     private void callInsertPlantingAPI() {
         progressBar.setVisibility(View.VISIBLE);
+        String pp = ppEditText.getText().toString();
+        String rr = rrEditText.getText().toString();
 
         ArrayList<PlantatingVarietyDataPojo> insertPlantationData = plantingResponse.data.get(0).plantation_data;
-
+        plantingResponse.data.get(0).pp = ppEditText.getText().toString();
+        plantingResponse.data.get(0).rr = rrEditText.getText().toString();
         Iterator<PlantatingVarietyDataPojo> iterator = insertPlantationData.iterator();
 
         while (iterator.hasNext()) {
@@ -148,49 +160,54 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
                 dataPojo.sample3 = "";
             }
         }
+        if(pp.length()>0 && rr.length()>0){
 
-        Call<UserLoginResponse> call = apiInterface.plantationupdate(plantingResponse);
-        call.enqueue(new Callback<UserLoginResponse>() {
-            @Override
-            public void onResponse(Call<UserLoginResponse> call, Response<UserLoginResponse> response) {
-                if (response.isSuccessful()) {
-                    UserLoginResponse plantingResponse1 = response.body();
-                    if (plantingResponse1 != null) {
-                        int statusCode = response.code();
-                        switch (statusCode) {
-                            case 200:
-                                progressBar.setVisibility(View.GONE);
-                                Toast.makeText(PlantationActivity.this, plantingResponse1.message, Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(PlantationActivity.this, FieldLayoutActivity.class);
-                                intent.putExtra("observationType", observationType);
-                                intent.putExtra("startDate", startDate);
-                                intent.putExtra("locationName", locationName);
-                                intent.putExtra("locationId", locationId);
-                                intent.putExtra("trialTypeId", trialTypeId);
-                                intent.putExtra("trialTypeName", trialTypeName);
-                                intent.putExtra("nReplications", nReplications);
-                                startActivity(intent);
-                                break;
-                            default:
-                                UIUtils.customToastMsg(PlantationActivity.this, "Unexpected response code: " + statusCode);
+            Call<UserLoginResponse> call = apiInterface.plantationupdate(plantingResponse);
+            call.enqueue(new Callback<UserLoginResponse>() {
+                @Override
+                public void onResponse(Call<UserLoginResponse> call, Response<UserLoginResponse> response) {
+                    if (response.isSuccessful()) {
+                        UserLoginResponse plantingResponse1 = response.body();
+                        if (plantingResponse1 != null) {
+                            int statusCode = response.code();
+                            switch (statusCode) {
+                                case 200:
+                                    progressBar.setVisibility(View.GONE);
+                                    Toast.makeText(PlantationActivity.this, plantingResponse1.message, Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(PlantationActivity.this, FieldLayoutActivity.class);
+                                    intent.putExtra("observationType", observationType);
+                                    intent.putExtra("startDate", startDate);
+                                    intent.putExtra("locationName", locationName);
+                                    intent.putExtra("locationId", locationId);
+                                    intent.putExtra("trialTypeId", trialTypeId);
+                                    intent.putExtra("trialTypeName", trialTypeName);
+                                    intent.putExtra("nReplications", nReplications);
+                                    startActivity(intent);
+                                    break;
+                                default:
+                                    UIUtils.customToastMsg(PlantationActivity.this, "Unexpected response code: " + statusCode);
+                            }
+                        } else {
+                            // Handle the case where the response body is null
+                            UIUtils.customToastMsg(PlantationActivity.this, "Response body is empty or null.");
                         }
-                    } else {
-                        // Handle the case where the response body is null
-                        UIUtils.customToastMsg(PlantationActivity.this, "Response body is empty or null.");
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<UserLoginResponse> call, Throwable t) {
-                UIUtils.customToastMsg(PlantationActivity.this, "Error");
-            }
-        });
+                @Override
+                public void onFailure(Call<UserLoginResponse> call, Throwable t) {
+                    UIUtils.customToastMsg(PlantationActivity.this, "Error");
+                }
+            });
+        } else {
+            UIUtils.customToastMsg(PlantationActivity.this, "Please enter P*P/R*R");
+        }
+
+
     }
 
     private void callApi() {
         progressBar.setVisibility(View.VISIBLE);
-        apiInterface = APIClient.getClient().create(APIInterface.class);
         Call<PlantingPojo> call = apiInterface.planting(userName, startDate, locationName, locationId, trialTypeName, trialTypeId);
         call.enqueue(new Callback<PlantingPojo>() {
             @Override
@@ -223,7 +240,7 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
                                         linearLayout.setVisibility(View.VISIBLE);
                                         btnSave.setVisibility(View.VISIBLE);
                                         cardViewLyt1.setVisibility(View.VISIBLE);
-                                        plantationAdapter = new PlantationAdapter(PlantationActivity.this, data.plantation_data, varietyCode, data.trialtypename);
+                                        plantationAdapter = new PlantationAdapter(PlantationActivity.this, data.plantation_data, varietyCode, data.trialtypename, data.n_replications);
                                         rvPlantation.setAdapter(plantationAdapter);
                                         moveItemToLastPosition(0, data.plantation_data);
                                     } else {
@@ -272,7 +289,12 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
     @Override
     protected void onResume() {
         super.onResume();
+        apiInterface = APIClient.getClient().create(APIInterface.class);
+
         if (UIUtils.isNetworkAvailable(PlantationActivity.this)) {
+            if(token != null && userName != null) {
+                callServerDateTimeAPi(token, userName);
+            }
             callApi();
             /*String jsonString = "{ \"data\": [ { \"farmername\": \"Amruta\", \"locationid\": \"LOC-25\", \"locationname\": \"Hubballi\", \"plantation_data\": [ { \"purpose\": \"Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5012\", \"varietyname\": \"K.Pukhraj\" }, { \"purpose\": \"Crisp\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5036\", \"varietyname\": \"L.R\" }, { \"purpose\": \"Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5190\", \"varietyname\": \"Tribute\" }, { \"purpose\": \"Table/Baker\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5191\", \"varietyname\": \"Reiver\" }, { \"purpose\": \"Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5192\", \"varietyname\": \"Sorrento\" }, { \"purpose\": \"Low GI/Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5193\", \"varietyname\": \"Pioneer\" }, { \"purpose\": \"Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5195\", \"varietyname\": \"ElMundo\" }, { \"purpose\": \"Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5196\", \"varietyname\": \"Everest\" }, { \"purpose\": \"Crisp/Purple flash with cream skin\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5200\", \"varietyname\": \"Tr 2015 -138\" }, { \"purpose\": \"Crisp\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5201\", \"varietyname\": \"Cr 2002-1\" }, { \"purpose\": \"Table/R in R\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5204\", \"varietyname\": \"Cr 2015-097\" }, { \"purpose\": \"Table/Crisp\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5211\", \"varietyname\": \"10.Z.342 A 5\" }, { \"purpose\": \"Table/Crisp\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5212\", \"varietyname\": \"10.Z.353 A 7\" }, { \"purpose\": \"Table/Crisp\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5213\", \"varietyname\": \"10.Z.380 A 3\" }, { \"purpose\": \"Table/Baker\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5214\", \"varietyname\": \"10.Z.381 A 3\" }, { \"purpose\": \"Table/Baker\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5215\", \"varietyname\": \"07.Z.31 C 21\" }, { \"purpose\": \"Table/Baker\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5216\", \"varietyname\": \"07.Z.21 A 12\" }, { \"purpose\": \"Low GI Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5217\", \"varietyname\": \"10.MRS.56 A 21\" }, { \"purpose\": \"Low GI Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5218\", \"varietyname\": \"10.MRS.2 A 9\" }, { \"purpose\": \"Crisp\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5219\", \"varietyname\": \"11.MRS.26 A 2\" }, { \"purpose\": \"Crisp/Low GI\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5220\", \"varietyname\": \"04.PD.2 A 7\" }, { \"purpose\": \"Table\", \"sample1\": null, \"sample2\": null, \"sample3\": null, \"varietycode\": \"5221\", \"varietyname\": \"03.MT.78 A 4\" } ], \"startdate\": \"2023-12-08\", \"state\": \"Karnataka\", \"stateid\": \"KA\", \"trialtypeid\": \"TRL-2\", \"trialtypename\": \"FastTrack PET\", \"trialyear\": \"2023\", \"username\": \"abc\" } ] }";
             PlantingPojo plantingResponse = parseJsonToAccessTokenResponse(jsonString);
@@ -315,6 +337,66 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
             Toast.makeText(PlantationActivity.this, getString(R.string.internet_connection), Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void callServerDateTimeAPi(String token, String userName) {
+        Call<UserLoginResponse> call = apiInterface.getServerDateTime(token, userName);
+        call.enqueue(new Callback<UserLoginResponse>() {
+            @Override
+            public void onResponse(Call<UserLoginResponse> call, Response<UserLoginResponse> response) {
+                if (response.isSuccessful()) {
+                    UserLoginResponse serverDateTime = response.body();
+                    if (serverDateTime != null) {
+                        int statusCode = response.code();
+                        switch (statusCode) {
+                            case 200:
+                                if (serverDateTime != null) {
+                                    String serverDateTimeString = serverDateTime.datetime;
+                                    String deviceCurrentDateTime = UIUtils.getCurrentDateTime();
+                                    int timeDiff = Integer.parseInt(UIUtils.findDifference(serverDateTimeString, deviceCurrentDateTime));
+                                    // 335 is the converted minutes for indian timing -- 5:30 + 5 minutes
+                                    if((Math.abs(timeDiff) >= 335)){
+                                        Toast.makeText(PlantationActivity.this, getString(R.string.time_diff) + 5 + " minutes", Toast.LENGTH_LONG).show();
+                                        Intent intent = new Intent(Settings.ACTION_DATE_SETTINGS);
+                                        dateSettingsLauncher.launch(intent);
+                                    }
+                                } else {
+                                    UIUtils.customToastMsg(PlantationActivity.this, "No Data Found...");
+                                }
+                                break;
+                            default:
+                                // Handle other response codes
+                                UIUtils.customToastMsg(PlantationActivity.this, "Unexpected response code: " + statusCode);
+                        }
+                    } else {
+                        // Handle the case where the response body is null
+                        UIUtils.customToastMsg(PlantationActivity.this, "Response body is empty or null.");
+                    }
+                    // Handle the successful response here
+                } else {
+                    // Handle the unsuccessful response here
+                    UIUtils.customToastMsg(PlantationActivity.this, "Error in response");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserLoginResponse> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private final ActivityResultLauncher<Intent> dateSettingsLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    // Handle the result if needed
+                    int resultCode = result.getResultCode();
+                    Intent data = result.getData();
+                    // Your logic here
+                }
+            }
+    );
 
     private PlantingPojo parseJsonToAccessTokenResponse(String jsonResponse) {
         Gson gson = new Gson();

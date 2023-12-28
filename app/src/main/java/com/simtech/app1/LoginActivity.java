@@ -88,6 +88,12 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        setContentView(R.layout.harvest);
+        // assigning ID of the toolbar to a variable
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(getString(R.string.user_login));
+        // using toolbar as ActionBar
+        setSupportActionBar(toolbar);
 
         apiInterface = APIClient.getClient().create(APIInterface.class);
         idBtnLogin = (Button) findViewById(R.id.idBtnLogin);
@@ -96,11 +102,15 @@ public class LoginActivity extends AppCompatActivity {
         dbManager = new DBManager(this);
         dbManager.open();
 
-        // assigning ID of the toolbar to a variable
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(getString(R.string.user_login));
-        // using toolbar as ActionBar
-        setSupportActionBar(toolbar);
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Add your custom logic here
+                // If you want to prevent the default back button behavior, don't call isEnabled()
+            }
+        };
+
+        LoginActivity.this.getOnBackPressedDispatcher().addCallback(LoginActivity.this, callback);
 
         idBtnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,21 +172,8 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     UIUtils.customToastMsg(LoginActivity.this, "Please enter proper credentials");
                 }
-
-                /*Intent intent = new Intent(LoginActivity.this, MainMenuActivity.class);
-                startActivity(intent);*/
             }
         });
-
-        /*OnBackPressedCallback callback = new OnBackPressedCallback(true *//* enabled by default *//*) {
-            @Override
-            public void handleOnBackPressed() {
-                // Add your custom logic here
-                // If you want to prevent the default back button behavior, don't call isEnabled()
-            }
-        };
-
-        LoginActivity.this.getOnBackPressedDispatcher().addCallback(LoginActivity.this, callback);*/
     }
 
     private UserLoginResponse parseJsonToAccessTokenResponse(String jsonResponse) {
@@ -748,6 +745,12 @@ public class LoginActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(UIUtils.isNetworkAvailable(LoginActivity.this)){
+            SharedPreferences mCredentialsStorage;
+            mCredentialsStorage = getSharedPreferences("AppSharedPreferences", MODE_PRIVATE);
+            String userName = mCredentialsStorage.getString(LoginActivity.USERNAME, null);
+            if(userName!=null && !userName.isEmpty()){
+                idEdtUserName.setText(userName);
+            }
         } else {
             Toast.makeText(LoginActivity.this, getString(R.string.internet_connection), Toast.LENGTH_SHORT).show();
         }

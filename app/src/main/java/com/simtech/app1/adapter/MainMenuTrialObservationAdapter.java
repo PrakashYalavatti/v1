@@ -2,7 +2,9 @@ package com.simtech.app1.adapter;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
+import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -13,7 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.simtech.app1.R;
@@ -80,16 +84,18 @@ public class MainMenuTrialObservationAdapter extends RecyclerView.Adapter<MainMe
         holder.tvTrialName.setText(trialTypeName);
         long noOfDaysDifference = UIUtils.getDiffNoOfDays(planningDate, currentDate);
 
-        String firstThreeCharacters = observationType.substring(0, 2);
-        // Convert the substring to an integer
-        integerValue = Integer.parseInt(firstThreeCharacters);
-        if(integerValue < 5 ){
-            holder.tvObservation.setBackgroundColor(Color.RED);
-            if (shouldRunAnimation(position)) {
-                // Run the animation
-                startInfiniteAnimation(holder.tvObservation);
-            } else {
-                // Optionally, stop the animation or set the view to its initial state
+        if(observationType != null){
+            String firstThreeCharacters = observationType.substring(0, 2);
+            // Convert the substring to an integer
+            integerValue = Integer.parseInt(firstThreeCharacters);
+            if(integerValue < 5 ){
+//            holder.tvObservation.setBackgroundColor(Color.RED);
+                if (shouldRunAnimation(position)) {
+                    // Run the animation
+                    startInfiniteAnimation(holder.tvObservation);
+                } else {
+                    // Optionally, stop the animation or set the view to its initial state
+                }
             }
         }
 
@@ -106,8 +112,14 @@ public class MainMenuTrialObservationAdapter extends RecyclerView.Adapter<MainMe
         } else if (noOfDaysDifference == 45) {
             observationType = context.getText(R.string.dap_45).toString();
             holder.tvObservation.setText(observationType);
-        } else {
-            observation = "invalid";
+        } else if(noOfDaysDifference == 90){
+//            observation = "invalid";
+            observationType = context.getText(R.string.harvest).toString();
+            holder.tvObservation.setText(observationType);
+        } else if(noOfDaysDifference > 90){
+            observationType = context.getText(R.string.cook_test).toString();
+            holder.tvObservation.setText(observationType);
+        }else {
             holder.tvObservation.setText(observationType);
         }
 
@@ -116,14 +128,19 @@ public class MainMenuTrialObservationAdapter extends RecyclerView.Adapter<MainMe
         holder.tvObservation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent plantationIntent = new Intent(context, FieldLayoutActivity.class);
-                plantationIntent.putExtra("observationType", finalObservationType);
-                plantationIntent.putExtra("startDate", planningDate);
-                plantationIntent.putExtra("locationName", locationName);
-                plantationIntent.putExtra("locationId", locationId);
-                plantationIntent.putExtra("trialTypeId", trialTypeId);
-                plantationIntent.putExtra("trialTypeName", trialTypeName);
-                context.startActivity(plantationIntent);
+//                if(noOfDaysDifference <= 2 ){
+                    Intent plantationIntent = new Intent(context, FieldLayoutActivity.class);
+                    plantationIntent.putExtra("observationType", finalObservationType);
+                    plantationIntent.putExtra("startDate", planningDate);
+                    plantationIntent.putExtra("locationName", locationName);
+                    plantationIntent.putExtra("locationId", locationId);
+                    plantationIntent.putExtra("trialTypeId", trialTypeId);
+                    plantationIntent.putExtra("trialTypeName", trialTypeName);
+                    context.startActivity(plantationIntent);
+//                } else {
+//                    Toast.makeText(context, "Observation date beyond 2 days", Toast.LENGTH_SHORT).show();
+//                }
+
                 /*if (finalObservation.equalsIgnoreCase("invalid")) {
                     Toast.makeText(context, finalObservationType, Toast.LENGTH_SHORT).show();
                 } else {
@@ -146,35 +163,18 @@ public class MainMenuTrialObservationAdapter extends RecyclerView.Adapter<MainMe
         return true;
     }
 
-    private void startInfiniteAnimation(View view) {
-        ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(view, "scaleX", 1f, 1.2f, 1f);
-        ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(view, "scaleY", 1f, 1.2f, 1f);
+    private void startInfiniteAnimation(TextView view) {
+        // Smooth Color Animation
+        ObjectAnimator colorAnimator = ObjectAnimator.ofInt(view, "textColor",
+                ContextCompat.getColor(context, R.color.white),
+                ContextCompat.getColor(context, R.color.red));
 
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.playTogether(scaleXAnimator, scaleYAnimator);
-        animatorSet.setDuration(1000); // Set the duration as needed
+        colorAnimator.setEvaluator(new ArgbEvaluator());
+        colorAnimator.setDuration(1000); // Set the duration as needed
+        colorAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        colorAnimator.setRepeatCount(ValueAnimator.INFINITE);
 
-        // Set repeat count for the entire set
-        animatorSet.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                // Optionally handle onAnimationEnd, if needed
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-            }
-        });
-
-        animatorSet.start();
+        colorAnimator.start();
     }
 
     @Override

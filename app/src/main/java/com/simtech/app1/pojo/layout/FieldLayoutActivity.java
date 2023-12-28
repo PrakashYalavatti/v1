@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -19,6 +20,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -47,13 +52,20 @@ import com.simtech.app1.apiservices.APIInterface;
 import com.simtech.app1.apiservices.apirequestresponse.UserLoginResponse;
 import com.simtech.app1.apputils.UIUtils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FieldLayoutActivity extends AppCompatActivity implements View.OnClickListener {
+public class FieldLayoutActivity extends AppCompatActivity {
     private String observation;
     private APIInterface apiInterface;
     private SharedPreferences mCredentialsStorage;
@@ -77,6 +89,7 @@ public class FieldLayoutActivity extends AppCompatActivity implements View.OnCli
     private String locationString;
     private TextView tvNoData;
     private CardView cardViewLyt1;
+    private Dialog customDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +134,7 @@ public class FieldLayoutActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onClick(View v) {
                 requestLocationPermissions();
+                customDialog = new Dialog(FieldLayoutActivity.this);
                 fieldCustomDialog(latitude, longitude);
             }
         });
@@ -271,7 +285,6 @@ public class FieldLayoutActivity extends AppCompatActivity implements View.OnCli
 
     private void callLayoutAPI() {
         showProgressBar();
-        apiInterface = APIClient.getClient().create(APIInterface.class);
         Call<LayoutDetailsPojo> call = apiInterface.layoutDetails(userName, planningDate, locationName, locationId, trialTypeName, trialTypeId);
         call.enqueue(new Callback<LayoutDetailsPojo>() {
             @Override
@@ -360,7 +373,11 @@ public class FieldLayoutActivity extends AppCompatActivity implements View.OnCli
     protected void onResume() {
         super.onResume();
         captureGps();
+        apiInterface = APIClient.getClient().create(APIInterface.class);
         if (UIUtils.isNetworkAvailable(FieldLayoutActivity.this)) {
+            if(token != null && userName != null) {
+                callServerDateTimeAPi(token, userName);
+            }
             callLayoutAPI();
             /*String jsonString = "{ \"data\": [ { \"farmer_name\": \"Amruta\", \"location_id\": \"LOC-25\", \"location_name\": \"Hubballi\", \"n_observation_lines\": \"4\", \"n_replications\": \"3\", \"purposes\": [ { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5012\", \"varietyname\": \"K.Pukhraj\" }, { \"observedvalue\": null, \"varietycode\": \"5190\", \"varietyname\": \"Tribute\" }, { \"observedvalue\": null, \"varietycode\": \"5192\", \"varietyname\": \"Sorrento\" }, { \"observedvalue\": null, \"varietycode\": \"5195\", \"varietyname\": \"ElMundo\" }, { \"observedvalue\": null, \"varietycode\": \"5196\", \"varietyname\": \"Everest\" }, { \"observedvalue\": null, \"varietycode\": \"5221\", \"varietyname\": \"03.MT.78 A 4\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5012\", \"varietyname\": \"K.Pukhraj\" }, { \"observedvalue\": null, \"varietycode\": \"5190\", \"varietyname\": \"Tribute\" }, { \"observedvalue\": null, \"varietycode\": \"5192\", \"varietyname\": \"Sorrento\" }, { \"observedvalue\": null, \"varietycode\": \"5195\", \"varietyname\": \"ElMundo\" }, { \"observedvalue\": null, \"varietycode\": \"5196\", \"varietyname\": \"Everest\" }, { \"observedvalue\": null, \"varietycode\": \"5221\", \"varietyname\": \"03.MT.78 A 4\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5012\", \"varietyname\": \"K.Pukhraj\" }, { \"observedvalue\": null, \"varietycode\": \"5190\", \"varietyname\": \"Tribute\" }, { \"observedvalue\": null, \"varietycode\": \"5192\", \"varietyname\": \"Sorrento\" }, { \"observedvalue\": null, \"varietycode\": \"5195\", \"varietyname\": \"ElMundo\" }, { \"observedvalue\": null, \"varietycode\": \"5196\", \"varietyname\": \"Everest\" }, { \"observedvalue\": null, \"varietycode\": \"5221\", \"varietyname\": \"03.MT.78 A 4\" } ] } ], \"purpose\": \"Table\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5036\", \"varietyname\": \"L.R\" }, { \"observedvalue\": null, \"varietycode\": \"5201\", \"varietyname\": \"Cr 2002-1\" }, { \"observedvalue\": null, \"varietycode\": \"5219\", \"varietyname\": \"11.MRS.26 A 2\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5036\", \"varietyname\": \"L.R\" }, { \"observedvalue\": null, \"varietycode\": \"5201\", \"varietyname\": \"Cr 2002-1\" }, { \"observedvalue\": null, \"varietycode\": \"5219\", \"varietyname\": \"11.MRS.26 A 2\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5036\", \"varietyname\": \"L.R\" }, { \"observedvalue\": null, \"varietycode\": \"5201\", \"varietyname\": \"Cr 2002-1\" }, { \"observedvalue\": null, \"varietycode\": \"5219\", \"varietyname\": \"11.MRS.26 A 2\" } ] } ], \"purpose\": \"Crisp\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5191\", \"varietyname\": \"Reiver\" }, { \"observedvalue\": null, \"varietycode\": \"5214\", \"varietyname\": \"10.Z.381 A 3\" }, { \"observedvalue\": null, \"varietycode\": \"5215\", \"varietyname\": \"07.Z.31 C 21\" }, { \"observedvalue\": null, \"varietycode\": \"5216\", \"varietyname\": \"07.Z.21 A 12\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5191\", \"varietyname\": \"Reiver\" }, { \"observedvalue\": null, \"varietycode\": \"5214\", \"varietyname\": \"10.Z.381 A 3\" }, { \"observedvalue\": null, \"varietycode\": \"5215\", \"varietyname\": \"07.Z.31 C 21\" }, { \"observedvalue\": null, \"varietycode\": \"5216\", \"varietyname\": \"07.Z.21 A 12\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5191\", \"varietyname\": \"Reiver\" }, { \"observedvalue\": null, \"varietycode\": \"5214\", \"varietyname\": \"10.Z.381 A 3\" }, { \"observedvalue\": null, \"varietycode\": \"5215\", \"varietyname\": \"07.Z.31 C 21\" }, { \"observedvalue\": null, \"varietycode\": \"5216\", \"varietyname\": \"07.Z.21 A 12\" } ] } ], \"purpose\": \"Table/Baker\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5193\", \"varietyname\": \"Pioneer\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5193\", \"varietyname\": \"Pioneer\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5193\", \"varietyname\": \"Pioneer\" } ] } ], \"purpose\": \"Low GI/Table\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5200\", \"varietyname\": \"Tr 2015 -138\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5200\", \"varietyname\": \"Tr 2015 -138\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5200\", \"varietyname\": \"Tr 2015 -138\" } ] } ], \"purpose\": \"Crisp/Purple flash with cream skin\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5204\", \"varietyname\": \"Cr 2015-097\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5204\", \"varietyname\": \"Cr 2015-097\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5204\", \"varietyname\": \"Cr 2015-097\" } ] } ], \"purpose\": \"Table/R in R\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5211\", \"varietyname\": \"10.Z.342 A 5\" }, { \"observedvalue\": null, \"varietycode\": \"5212\", \"varietyname\": \"10.Z.353 A 7\" }, { \"observedvalue\": null, \"varietycode\": \"5213\", \"varietyname\": \"10.Z.380 A 3\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5211\", \"varietyname\": \"10.Z.342 A 5\" }, { \"observedvalue\": null, \"varietycode\": \"5212\", \"varietyname\": \"10.Z.353 A 7\" }, { \"observedvalue\": null, \"varietycode\": \"5213\", \"varietyname\": \"10.Z.380 A 3\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5211\", \"varietyname\": \"10.Z.342 A 5\" }, { \"observedvalue\": null, \"varietycode\": \"5212\", \"varietyname\": \"10.Z.353 A 7\" }, { \"observedvalue\": null, \"varietycode\": \"5213\", \"varietyname\": \"10.Z.380 A 3\" } ] } ], \"purpose\": \"Table/Crisp\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5217\", \"varietyname\": \"10.MRS.56 A 21\" }, { \"observedvalue\": null, \"varietycode\": \"5218\", \"varietyname\": \"10.MRS.2 A 9\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5217\", \"varietyname\": \"10.MRS.56 A 21\" }, { \"observedvalue\": null, \"varietycode\": \"5218\", \"varietyname\": \"10.MRS.2 A 9\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5217\", \"varietyname\": \"10.MRS.56 A 21\" }, { \"observedvalue\": null, \"varietycode\": \"5218\", \"varietyname\": \"10.MRS.2 A 9\" } ] } ], \"purpose\": \"Low GI Table\" }, { \"observations\": [ { \"observation\": \"R1\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5220\", \"varietyname\": \"04.PD.2 A 7\" } ] }, { \"observation\": \"R2\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5220\", \"varietyname\": \"04.PD.2 A 7\" } ] }, { \"observation\": \"R3\", \"varieties\": [ { \"observedvalue\": null, \"varietycode\": \"5220\", \"varietyname\": \"04.PD.2 A 7\" } ] } ], \"purpose\": \"Crisp/Low GI\" } ], \"start_date\": \"2023-12-08\", \"state\": \"Karnataka\", \"state_id\": \"KA\", \"trial_type_id\": \"TRL-1\", \"trial_type_name\": \"Regular PET\", \"trial_year\": \"2023\" } ] }";
             LayoutDetailsPojo mainMenuResponse = parseJsonToAccessTokenResponse(jsonString);
@@ -408,6 +425,66 @@ public class FieldLayoutActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+    private void callServerDateTimeAPi(String token, String userName) {
+        Call<UserLoginResponse> call = apiInterface.getServerDateTime(token, userName);
+        call.enqueue(new Callback<UserLoginResponse>() {
+            @Override
+            public void onResponse(Call<UserLoginResponse> call, Response<UserLoginResponse> response) {
+                if (response.isSuccessful()) {
+                    UserLoginResponse serverDateTime = response.body();
+                    if (serverDateTime != null) {
+                        int statusCode = response.code();
+                        switch (statusCode) {
+                            case 200:
+                                if (serverDateTime != null) {
+                                    String serverDateTimeString = serverDateTime.datetime;
+                                    String deviceCurrentDateTime = UIUtils.getCurrentDateTime();
+                                    int timeDiff = Integer.parseInt(UIUtils.findDifference(serverDateTimeString, deviceCurrentDateTime));
+                                    // 335 is the converted minutes for indian timing -- 5:30 + 5 minutes
+                                    if((Math.abs(timeDiff) >= 335)){
+                                        Toast.makeText(FieldLayoutActivity.this, getString(R.string.time_diff) + 5 + " minutes", Toast.LENGTH_LONG).show();
+                                        Intent intent = new Intent(Settings.ACTION_DATE_SETTINGS);
+                                        dateSettingsLauncher.launch(intent);
+                                    }
+                                } else {
+                                    UIUtils.customToastMsg(FieldLayoutActivity.this, "No Data Found...");
+                                }
+                                break;
+                            default:
+                                // Handle other response codes
+                                UIUtils.customToastMsg(FieldLayoutActivity.this, "Unexpected response code: " + statusCode);
+                        }
+                    } else {
+                        // Handle the case where the response body is null
+                        UIUtils.customToastMsg(FieldLayoutActivity.this, "Response body is empty or null.");
+                    }
+                    // Handle the successful response here
+                } else {
+                    // Handle the unsuccessful response here
+                    UIUtils.customToastMsg(FieldLayoutActivity.this, "Error in response");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserLoginResponse> call, Throwable t) {
+                UIUtils.customToastMsg(FieldLayoutActivity.this, "Error in response");
+            }
+        });
+    }
+
+    private final ActivityResultLauncher<Intent> dateSettingsLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    // Handle the result if needed
+                    int resultCode = result.getResultCode();
+                    Intent data = result.getData();
+                    // Your logic here
+                }
+            }
+    );
+
     private LayoutDetailsPojo parseJsonToAccessTokenResponse(String jsonResponse) {
         Gson gson = new Gson();
         return gson.fromJson(jsonResponse, LayoutDetailsPojo.class);
@@ -418,11 +495,11 @@ public class FieldLayoutActivity extends AppCompatActivity implements View.OnCli
         stopLocationUpdates();
     }
 
-    @Override
+    /*@Override
     protected void onPause() {
         super.onPause();
         stopLocationUpdates();
-    }
+    }*/
 
     private void stopLocationUpdates() {
         if (mFusedLocationClient != null && mLocationCallback != null) {
@@ -432,58 +509,102 @@ public class FieldLayoutActivity extends AppCompatActivity implements View.OnCli
 
     private void fieldCustomDialog(double latitude, double longitude) {
         // Create custom dialog instance
-        Dialog customDialog = new Dialog(this);
         customDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         customDialog.setContentView(R.layout.field_custom_dialog);
 
         // Find buttons in the custom dialog
-        Button topLeftButton = customDialog.findViewById(R.id.topLeftButton);
-        Button topRightButton = customDialog.findViewById(R.id.topRightButton);
-        Button bottomLeftButton = customDialog.findViewById(R.id.bottomLeftButton);
-        Button bottomRightButton = customDialog.findViewById(R.id.bottomRightButton);
+        Button btnCaptureGps = customDialog.findViewById(R.id.btnCaptureGps);
+        Button btnCapturedMap = customDialog.findViewById(R.id.btnCapturedMap);
 
         // Set click listeners for buttons
-        topLeftButton.setOnClickListener(this);
-        topRightButton.setOnClickListener(this);
-        bottomLeftButton.setOnClickListener(this);
-        bottomRightButton.setOnClickListener(this);
+        btnCaptureGps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Toast.makeText(FieldLayoutActivity.this, locationString, Toast.LENGTH_SHORT).show();
+                LocalDate date = null;
+                int yearOnly = 0;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    date = LocalDate.parse(planningDate, DateTimeFormatter.ISO_LOCAL_DATE);
+                    yearOnly = date.getYear();
+                } else {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    try {
+                        Date parsedDate = sdf.parse(planningDate);
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(parsedDate);
+                        yearOnly = calendar.get(Calendar.YEAR);
+                    } catch (ParseException e) {
+                        // Handle parsing exception
+                        e.printStackTrace();
+                    }
+                }
+                CapturedGPSPojo capturedGPSPojo = new CapturedGPSPojo();
+                capturedGPSPojo.trialyear = String.valueOf(yearOnly);
+                capturedGPSPojo.plantationdate = planningDate;
+                capturedGPSPojo.locationid = locationId;
+                capturedGPSPojo.trialtypeid = trialTypeId;
+                capturedGPSPojo.Latitude = String.valueOf(latitude);
+                capturedGPSPojo.Longitude = String.valueOf(longitude);
+                if(latitude>0 && longitude>0){
+                    /*Gson gson = new Gson();
+                    // Convert POJO to JSON
+                    String jsonString = gson.toJson(capturedGPSPojo);
+                    // Print the JSON representation
+                    System.out.println(jsonString);*/
+//                    Toast.makeText(FieldLayoutActivity.this, jsonString, Toast.LENGTH_SHORT).show();
+                    callCapturedGPSAPI(capturedGPSPojo);
+                } else {
+                    Toast.makeText(FieldLayoutActivity.this, "Please re-capture the GPS coordinates", Toast.LENGTH_SHORT).show();
+                    if(customDialog.isShowing()){
+                        customDialog.dismiss();
+                    }
+                }
+            }
+        });
+
+        btnCapturedMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         // Show the custom dialog
         customDialog.show();
     }
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.topLeftButton:
-                // Handle top left button click
-                locationString = "Latitude: " + mCurrentLocation.getLatitude()
-                        + "\nLongitude: " + mCurrentLocation.getLongitude();
-                Toast.makeText(this, locationString, Toast.LENGTH_SHORT).show();
-                break;
 
-            case R.id.topRightButton:
-                // Handle top right button click
-                locationString = "Latitude: " + mCurrentLocation.getLatitude()
-                        + "\nLongitude: " + mCurrentLocation.getLongitude();
-                Toast.makeText(this, locationString, Toast.LENGTH_SHORT).show();
-                Log.e("GPS", locationString);
-                break;
+    private void callCapturedGPSAPI(CapturedGPSPojo capturedGPSPojo) {
+        Call<UserLoginResponse> call = apiInterface.capturedgpsdata(capturedGPSPojo);
+        call.enqueue(new Callback<UserLoginResponse>() {
+            @Override
+            public void onResponse(Call<UserLoginResponse> call, Response<UserLoginResponse> response) {
+                if (response.isSuccessful()) {
+                    UserLoginResponse dapResponse = response.body();
+                    if (dapResponse != null) {
+                        int statusCode = response.code();
+                        switch (statusCode) {
+                            case 201:
+                                if(customDialog.isShowing()){
+                                    customDialog.dismiss();
+                                }
+                                Toast.makeText(FieldLayoutActivity.this, dapResponse.message, Toast.LENGTH_SHORT).show();
+                                break;
+                            case 500:
+                                Toast.makeText(FieldLayoutActivity.this, dapResponse.message, Toast.LENGTH_SHORT).show();
+                                break;
+                            default:
+                                UIUtils.customToastMsg(FieldLayoutActivity.this, "Response body is empty or null.");
+                        }
+                    }
+                } else {
+                    UIUtils.customToastMsg(FieldLayoutActivity.this, "Response body is empty or null.");
+                }
+            }
 
-            case R.id.bottomLeftButton:
-                // Handle bottom left button click
-                locationString = "Latitude: " + mCurrentLocation.getLatitude()
-                        + "\nLongitude: " + mCurrentLocation.getLongitude();
-                Toast.makeText(this, locationString, Toast.LENGTH_SHORT).show();
-                Log.e("GPS", locationString);
-                break;
-
-            case R.id.bottomRightButton:
-                // Handle bottom right button click
-                locationString = "Latitude: " + mCurrentLocation.getLatitude()
-                        + "\nLongitude: " + mCurrentLocation.getLongitude();
-                Toast.makeText(this, locationString, Toast.LENGTH_SHORT).show();
-                Log.e("GPS", locationString);
-                break;
-        }
+            @Override
+            public void onFailure(Call<UserLoginResponse> call, Throwable t) {
+                UIUtils.customToastMsg(FieldLayoutActivity.this, "Error");
+            }
+        });
     }
 }

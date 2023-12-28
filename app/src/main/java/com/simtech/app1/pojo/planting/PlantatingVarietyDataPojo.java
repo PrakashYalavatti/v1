@@ -6,6 +6,8 @@ public class PlantatingVarietyDataPojo {
     public String varietycode;
     public String varietyname;
 
+    public String remarks;
+
     public String sample1;
 
     public String getSample1() {

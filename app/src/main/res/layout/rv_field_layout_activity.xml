@@ -35,7 +35,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                android:text="0"
                 android:textColor="#ffff"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -82,7 +81,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:text="Farmer's Name: Parashuram"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -92,7 +90,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:text="Location: Sambhal"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -102,7 +99,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:text="Planting Date: 25-10-2023"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -112,7 +108,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:text="Planting Date: 25-10-2023"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -131,7 +126,7 @@
                 android:background="@drawable/item_border_green"
                 android:padding="5dp"
                 android:textColor="@color/app_color"
-                android:text="Capture GPS"/>
+                android:text="@string/capture_GPS"/>
 
         </LinearLayout>
 
@@ -166,7 +161,7 @@
         android:layout_height="match_parent"
         android:id="@+id/tvNoData"
         android:visibility="gone"
-        android:text="No Data Found"
+        android:text="@string/no_data_found"
         android:textSize="16sp"
         android:textColor="@color/black"
         android:gravity="center"
