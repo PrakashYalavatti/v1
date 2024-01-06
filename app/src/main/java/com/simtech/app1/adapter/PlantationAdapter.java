@@ -110,7 +110,7 @@ public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.Vi
                     holder.etSample1.setText("");
                     holder.etSample1.setSelection(holder.etSample1.getText().length());
                 }
-                if (editable.toString().length()>1) {
+                if (editable.toString().length()>=1) {
                     Double sample1 = Double.valueOf(editable.toString());
                     if (sample1 < 16) {
                         DecimalFormat decimalFormat = new DecimalFormat("##.###");
@@ -141,7 +141,7 @@ public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.Vi
                     holder.etSample2.setText("");
                     holder.etSample2.setSelection(holder.etSample2.getText().length());
                 }
-                if (editable.toString().length()>1) {
+                if (editable.toString().length()>=1) {
                     Double sample2 = Double.valueOf(editable.toString());
                     if (sample2 < 16) {
                         DecimalFormat decimalFormat = new DecimalFormat("##.###");
@@ -172,7 +172,7 @@ public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.Vi
                     holder.etSample3.setText("");
                     holder.etSample3.setSelection(holder.etSample3.getText().length());
                 }
-                if (editable.toString().length()>1) {
+                if (editable.toString().length()>=1) {
                     Double sample3 = Double.valueOf(editable.toString());
                     if (sample3 < 16) {
                         DecimalFormat decimalFormat = new DecimalFormat("##.###");
@@ -184,6 +184,23 @@ public class PlantationAdapter extends RecyclerView.Adapter<PlantationAdapter.Vi
                         holder.etSample3.setText("");
                     }
                 }
+            }
+        });
+
+        holder.etRemarks.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                varietyDataPojo.remarks = s.toString();
             }
         });
 
