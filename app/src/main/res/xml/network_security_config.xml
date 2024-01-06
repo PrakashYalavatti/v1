@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <base-config cleartextTrafficPermitted="true">
+    <!--<base-config cleartextTrafficPermitted="true">
         <trust-anchors>
-            <certificates src="system" />
-            <certificates src="user" />
+           &lt;!&ndash; <certificates src="@raw/server" />
+            <certificates src="@raw/server_key" />&ndash;&gt;
         </trust-anchors>
-    </base-config>
+    </base-config>-->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">https://192.168.0.25:4433</domain>
+    </domain-config>
 </network-security-config>

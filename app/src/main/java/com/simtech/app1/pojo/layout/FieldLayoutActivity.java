@@ -546,11 +546,11 @@ public class FieldLayoutActivity extends AppCompatActivity {
                 capturedGPSPojo.Latitude = String.valueOf(latitude);
                 capturedGPSPojo.Longitude = String.valueOf(longitude);
                 if(latitude>0 && longitude>0){
-                    /*Gson gson = new Gson();
+                    Gson gson = new Gson();
                     // Convert POJO to JSON
                     String jsonString = gson.toJson(capturedGPSPojo);
                     // Print the JSON representation
-                    System.out.println(jsonString);*/
+                    System.out.println(jsonString);
 //                    Toast.makeText(FieldLayoutActivity.this, jsonString, Toast.LENGTH_SHORT).show();
                     callCapturedGPSAPI(capturedGPSPojo);
                 } else {
@@ -583,7 +583,7 @@ public class FieldLayoutActivity extends AppCompatActivity {
                     if (dapResponse != null) {
                         int statusCode = response.code();
                         switch (statusCode) {
-                            case 201:
+                            case 200:
                                 if(customDialog.isShowing()){
                                     customDialog.dismiss();
                                 }

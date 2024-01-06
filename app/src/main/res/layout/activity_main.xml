@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -65,114 +64,105 @@
 
     <!--text view for heading-->
 
-    <RelativeLayout
-        android:id="@+id/rl1"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_below="@id/appBarLayout"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/idTVHeader"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="60dp"
-                android:gravity="center_horizontal"
-                android:padding="5dp"
-                android:text="Welcome to Technico Agri Sciences Limited"
-                android:textAlignment="center"
-                android:textColor="@color/app_color"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:typeface="serif" />
-
-            <!--edit text for user name-->
-            <EditText
-                android:id="@+id/idEdtUserName"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_below="@id/idTVHeader"
-                android:layout_marginStart="80dp"
-                android:layout_marginTop="40dp"
-                android:layout_marginEnd="80dp"
-                android:background="@drawable/round_rect_edittext"
-                android:hint="Enter Name"
-                android:inputType="textEmailAddress"
-                android:paddingLeft="10dp"
-                android:text="shivani"
-                android:textColorHint="@color/black"
-                android:typeface="serif" />
-
-            <!--edit text for user password-->
-            <EditText
-                android:id="@+id/idEdtPassword"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_below="@id/idEdtUserName"
-                android:layout_marginStart="80dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="80dp"
-                android:background="@drawable/round_rect_edittext"
-                android:hint="Enter Password"
-                android:inputType="textPassword"
-                android:paddingLeft="10dp"
-                android:text="123456"
-                android:textColorHint="@color/black"
-                android:typeface="serif" />
-
-            <Button
-                android:id="@+id/idBtnLogin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/idEdtPassword"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="40dp"
-                android:layout_marginRight="10dp"
-                android:background="@drawable/sp_background"
-                android:text="Login"
-                android:textAllCaps="false"
-                android:textColor="@color/app_color"
-                android:textStyle="bold"
-                android:typeface="serif"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-        </LinearLayout>
-
-        <RelativeLayout
+        <TextView
+            android:id="@+id/idTVHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center|bottom">
+            android:layout_marginTop="60dp"
+            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+            android:gravity="center_horizontal"
+            android:padding="5dp"
+            android:text="Welcome to Technico Agri Sciences Limited"
+            android:textAlignment="center"
+            android:textColor="@color/app_color"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:typeface="serif" />/>
 
-            <TextView
-                android:id="@+id/tvPoweredBy"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginLeft="70dp"
-                android:gravity="center"
-                android:text="Powered by "
-                android:textColor="@color/app_color"
-                android:textSize="18sp" />
+        <!--edit text for user name-->
+        <EditText
+            android:id="@+id/idEdtUserName"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@id/idTVHeader"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="80dp"
+            android:background="@drawable/round_rect_edittext"
+            android:hint="Enter Name"
+            android:inputType="text"
+            android:paddingLeft="10dp"
+            android:textColorHint="@color/black"
+            android:typeface="serif" />
 
-            <ImageView
-                android:id="@+id/logo"
-                android:layout_width="100dp"
-                android:layout_height="40dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginRight="70dp"
-                android:layout_toRightOf="@+id/tvPoweredBy"
-                android:background="@drawable/sim_logo"
-                android:textColor="@color/app_color" />
-        </RelativeLayout>
+        <!--edit text for user password-->
+        <EditText
+            android:id="@+id/idEdtPassword"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@id/idEdtUserName"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="80dp"
+            android:background="@drawable/round_rect_edittext"
+            android:hint="Enter Password"
+            android:inputType="textPassword"
+            android:paddingLeft="10dp"
+            android:textColorHint="@color/black"
+            android:typeface="serif" />
 
-    </RelativeLayout>
+        <Button
+            android:id="@+id/idBtnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/idEdtPassword"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/sp_background"
+            android:text="Login"
+            android:textAllCaps="false"
+            android:textColor="@color/app_color"
+            android:textStyle="bold"
+            android:typeface="serif"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center|bottom">
+
+        <TextView
+            android:id="@+id/tvPoweredBy"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="70dp"
+            android:gravity="center"
+            android:text="Powered by "
+            android:textColor="@color/app_color"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="70dp"
+            android:layout_toRightOf="@+id/tvPoweredBy"
+            android:background="@drawable/sim_logo"
+            android:textColor="@color/app_color" />
+    </LinearLayout>
 
     <!--button to register our new user-->
-
 </LinearLayout>

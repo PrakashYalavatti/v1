@@ -6,9 +6,11 @@ import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.text.Editable;
 import android.text.InputType;
 import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,6 +26,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import com.google.gson.Gson;
 import com.simtech.app1.BuildConfig;
 import com.simtech.app1.R;
@@ -50,6 +56,7 @@ public class UIUtils {
 
     private static ProgressDialog sProgressDialog;
     private static APIInterface apiInterface;
+    private static boolean isViewVisible = false;
 
     public static void customToastMsg(Context context, String message) {
         try {
@@ -201,108 +208,6 @@ public class UIUtils {
             tvTask.setText("Plant data for 30 days");
         }
 
-        /*editTextL1.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-                if (editable.toString().length()>1) {
-                    Integer sample1 = Integer.valueOf(editable.toString());
-                    if (sample1 <= 25) {
-                        editTextL1.setText(editable.toString());
-                    } else {
-                        editTextL1.setError("Please enter value below 25");
-                        editTextL1.setText("");
-                    }
-                }
-            }
-        });
-        editTextL2.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-                if (editable.toString().length()>1) {
-                    Double sample2 = Double.valueOf(editable.toString());
-                    if (sample2 <= 25) {
-                        editTextL2.setText(editable.toString());
-                    } else {
-                        editTextL2.setError("Please enter value below 25");
-                        editTextL2.setText("");
-                    }
-                }
-            }
-        });
-
-        editTextL3.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-                if (editable.toString().length()>1) {
-                    Double sample3 = Double.valueOf(editable.toString());
-                    if (sample3 <= 25) {
-                        editTextL3.setText(editable.toString());
-                    } else {
-                        editTextL3.setError("Please enter value below 25");
-                        editTextL3.setText("");
-                    }
-                }
-            }
-        });
-
-        editTextL4.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-                if (editable.toString().length()>1) {
-                    Double sample4 = Double.valueOf(editable.toString());
-                    if (sample4 <= 25) {
-                        editTextL4.setText(editable.toString());
-                    } else {
-                        editTextL4.setError("Please enter value below 25");
-                        editTextL4.setText("");
-                    }
-                }
-            }
-        });*/
-
         if ((observationType.contains("20 DAP") || observationType.contains("30 DAP")) && (trialTypeId.equalsIgnoreCase("TRL-1"))) {
             tvCanopy.setVisibility(View.GONE);
             editTextCanopy.setVisibility(View.GONE);
@@ -337,71 +242,127 @@ public class UIUtils {
             tvL2.setText("Sample2");
             tvL3.setText("Sample3");
         }
-        // Access the other EditText fields (editText3, editText4, and editText5) as needed
-        builder.setPositiveButton("Save", (dialog, which) -> {
-            // Handle OK button click
 
-            String textCanopy = editTextCanopy.getText().toString();
-            String textL1 = editTextL1.getText().toString();
-            String textL2 = editTextL2.getText().toString();
-            String textL3 = editTextL3.getText().toString();
-            String textL4 = editTextL4.getText().toString();
-            String textRemarks = etRemarks.getText().toString();
+        builder.setPositiveButton("Save", null); // Set null for the OnClickListener initially
+        builder.setNegativeButton("Cancel", null); // Set null for the OnClickListener initially
 
-            LocalDate date = null;
-            int yearOnly = 0;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                date = LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE);
-                yearOnly = date.getYear();
-            } else {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                try {
-                    Date parsedDate = sdf.parse(startDate);
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(parsedDate);
-                    yearOnly = calendar.get(Calendar.YEAR);
-                } catch (ParseException e) {
-                    // Handle parsing exception
-                    e.printStackTrace();
-                }
-            }
-            String observation = "";
-            if(observationType.contains("20 DAP")){
-                observation = "20dap";
-            } else if(observationType.contains("30 DAP")){
-                observation = "30dap";
-            } else if(observationType.contains("45 DAP")){
-                observation = "45dap";
-            }
-            // Create a JSONObject and add key-value pairs
-            DAPPojo dapPojo = new DAPPojo();
-            dapPojo.locationid = locationId;
-            dapPojo.trialtypeid = trialTypeId;
-            dapPojo.trialyear = yearOnly + "";
-            dapPojo.varietycode = vatietyCode;
-            dapPojo.replication = replicationName;
-            dapPojo.l1 = textL1;
-            dapPojo.l2 = textL2;
-            dapPojo.l3 = textL3;
-            dapPojo.l4 = textL4;
-            dapPojo.canopy = textCanopy;
-            dapPojo.remarks = textRemarks;
-            dapPojo.fromdap = observation;
-            if (UIUtils.isNetworkAvailable(context)) {
-                callApiForDapInsertion(context, dapPojo);
-            } else {
-                Toast.makeText(context, context.getString(R.string.data_not_saved_internet), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> {
-            // Handle Cancel button click
-            dialog.dismiss();
-        });
-
-        // Create and show the dialog
         AlertDialog dialog = builder.create();
+
+        // Set a custom OnClickListener for the positive button after creating the dialog
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE);
+
+                positiveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String textCanopy = editTextCanopy.getText().toString();
+                        String textL1 = editTextL1.getText().toString();
+                        String textL2 = editTextL2.getText().toString();
+                        String textL3 = editTextL3.getText().toString();
+                        String textL4 = editTextL4.getText().toString();
+                        String textRemarks = etRemarks.getText().toString();
+
+                        if (isFieldEmpty(editTextL1)) {
+                            // Field 1 is empty, handle this case
+                            editTextL1.setError("Please enter L1");
+                            return;
+                        }
+
+                        // Proceed to the next field
+                        if (isFieldEmpty(editTextL2)) {
+                            // Field 2 is empty, handle this case
+                            editTextL2.setError("Please enter L2");
+                            return;
+                        }
+
+                        // Proceed to the next field
+                        if (isFieldEmpty(editTextL3) && editTextL3.getVisibility() == View.VISIBLE) {
+                            // Field 3 is empty, handle this case
+                            editTextL3.setError("Please enter L3");
+                            return;
+                        }
+
+                        // Proceed to the next field
+                        if (isFieldEmpty(editTextL4) && editTextL4.getVisibility() == View.VISIBLE) {
+                            // Field 4 is empty, handle this case
+                            editTextL4.setError("Please enter L4");
+                            return;
+                        }
+
+                        LocalDate date = null;
+                        int yearOnly = 0;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            date = LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE);
+                            yearOnly = date.getYear();
+                        } else {
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                            try {
+                                Date parsedDate = sdf.parse(startDate);
+                                Calendar calendar = Calendar.getInstance();
+                                calendar.setTime(parsedDate);
+                                yearOnly = calendar.get(Calendar.YEAR);
+                            } catch (ParseException e) {
+                                // Handle parsing exception
+                                e.printStackTrace();
+                            }
+                        }
+                        String observation = "";
+                        if(observationType.contains("20 DAP")){
+                            observation = "20dap";
+                        } else if(observationType.contains("30 DAP")){
+                            observation = "30dap";
+                        } else if(observationType.contains("45 DAP")){
+                            observation = "45dap";
+                        }
+                        // Create a JSONObject and add key-value pairs
+                        DAPPojo dapPojo = new DAPPojo();
+                        dapPojo.locationid = locationId;
+                        dapPojo.trialtypeid = trialTypeId;
+                        dapPojo.trialyear = yearOnly + "";
+                        dapPojo.varietycode = vatietyCode;
+                        dapPojo.replication = replicationName;
+                        dapPojo.l1 = textL1;
+                        dapPojo.l2 = textL2;
+                        dapPojo.l3 = textL3;
+                        dapPojo.l4 = textL4;
+                        dapPojo.canopy = textCanopy;
+                        dapPojo.remarks = textRemarks;
+                        dapPojo.fromdap = observation;
+                        if (UIUtils.isNetworkAvailable(context)) {
+                            callApiForDapInsertion(context, dapPojo);
+                        } else {
+                            Toast.makeText(context, context.getString(R.string.data_not_saved_internet), Toast.LENGTH_SHORT).show();
+                        }
+
+                        dialog.dismiss();
+                    }
+                });
+
+                Button nagetiveButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE);
+                nagetiveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+
         dialog.show();
+    }
+
+    // Helper method to check if an EditText field is empty
+    private static boolean isFieldEmpty(EditText editText) {
+        String text = editText.getText().toString().trim();
+        if (text.isEmpty() || text.length()<1) {
+            // Display an error message or handle the case where the field is empty
+            editText.setError("This field is required");
+            return true; // Field is empty
+        } else {
+            return false; // Field is not empty
+        }
     }
 
     public static void showDialogWithL5(Context context, String observationType, String startDate,
@@ -441,6 +402,7 @@ public class UIUtils {
             editTextL3.setVisibility(View.GONE);
             tvL4.setVisibility(View.GONE);
             editTextL4.setVisibility(View.GONE);
+            isViewVisible = true;
         } else if (observationType.contains("45 DAP") && trialTypeId.equalsIgnoreCase("TRL-2")) {
             tvCanopy.setVisibility(View.VISIBLE);
             spinnerCanopy.setVisibility(View.VISIBLE);
@@ -448,6 +410,7 @@ public class UIUtils {
             editTextL3.setVisibility(View.GONE);
             tvL4.setVisibility(View.GONE);
             editTextL4.setVisibility(View.GONE);
+            isViewVisible = true;
         } else if ((observationType.contains("20 DAP") || observationType.contains("30 DAP")) && (trialTypeId.equalsIgnoreCase("TRL-3"))) {
             tvCanopy.setVisibility(View.GONE);
             spinnerCanopy.setVisibility(View.GONE);
@@ -456,6 +419,7 @@ public class UIUtils {
             tvL1.setText("Sample1");
             tvL2.setText("Sample2");
             tvL3.setText("Sample3");
+            isViewVisible = true;
         } else if (observationType.contains("45 DAP") && (trialTypeId.equalsIgnoreCase("TRL-3"))) {
             tvCanopy.setVisibility(View.VISIBLE);
             spinnerCanopy.setVisibility(View.VISIBLE);
@@ -464,6 +428,7 @@ public class UIUtils {
             tvL1.setText("Sample1");
             tvL2.setText("Sample2");
             tvL3.setText("Sample3");
+            isViewVisible = true;
         }
 
 
@@ -496,7 +461,13 @@ public class UIUtils {
                 // Do nothing here if nothing is selected
             }
         });
-        // Access the other EditText fields (editText3, editText4, and editText5) as needed
+
+        builder.setPositiveButton("Save", null); // Set null for the OnClickListener initially
+        builder.setNegativeButton("Cancel", null); // Set null for the OnClickListener initially
+
+        AlertDialog dialog = builder.create();
+
+        /*// Access the other EditText fields (editText3, editText4, and editText5) as needed
         builder.setPositiveButton("Save", (dialog, which) -> {
             // Handle OK button click
             String textCanopy = selectedItem[0].toString();
@@ -505,17 +476,74 @@ public class UIUtils {
             String textL3 = editTextL3.getText().toString();
             String textL4 = editTextL4.getText().toString();
             String textRemarks = etRemarks.getText().toString();
+
             handleSaveButtonClick(context, dialog, startDate, observationType, locationId, trialTypeId, vatietyCode,
                     replicationName, textRemarks, textCanopy, textL1, textL2, textL3, textL4);
+        });*/
+
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE);
+                positiveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String textCanopy = selectedItem[0].toString();
+                        String textL1 = editTextL1.getText().toString();
+                        String textL2 = editTextL2.getText().toString();
+                        String textL3 = editTextL3.getText().toString();
+                        String textL4 = editTextL4.getText().toString();
+                        String textRemarks = etRemarks.getText().toString();
+
+                        if(textCanopy.equalsIgnoreCase("Select %")){
+                            Toast.makeText(context, "Please select canopy", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        if (isFieldEmpty(editTextL1)) {
+                            // Field 1 is empty, handle this case
+                            editTextL1.setError("Please enter L1");
+                            return;
+                        }
+
+                        // Proceed to the next field
+                        if (isFieldEmpty(editTextL2)) {
+                            // Field 2 is empty, handle this case
+                            editTextL2.setError("Please enter L2");
+                            return;
+                        }
+
+                        // Proceed to the next field
+                        if (isFieldEmpty(editTextL3) && (editTextL3.getVisibility() == View.VISIBLE)) {
+                            // Field 3 is empty, handle this case
+                            editTextL3.setError("Please enter L3");
+                            return;
+                        }
+
+                        // Proceed to the next field
+                        if (isFieldEmpty(editTextL4) && editTextL4.getVisibility() == View.VISIBLE) {
+                            // Field 4 is empty, handle this case
+                            editTextL4.setError("Please enter L4");
+                            return;
+                        }
+
+                        handleSaveButtonClick(context, dialog, startDate, observationType, locationId, trialTypeId, vatietyCode,
+                                replicationName, textRemarks, textCanopy, textL1, textL2, textL3, textL4);
+
+                        dialog.dismiss();
+                    }
+                });
+
+                Button nagetiveButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE);
+                nagetiveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+            }
         });
 
-        builder.setNegativeButton("Cancel", (dialog, which) -> {
-            // Handle Cancel button click
-            dialog.dismiss();
-        });
-
-        // Create and show the dialog
-        AlertDialog dialog = builder.create();
         dialog.getWindow().setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT
@@ -552,78 +580,11 @@ public class UIUtils {
         TextView tvabnoramlityGreater45 = dialogView.findViewById(R.id.abnoramlityGreater45);
         TextView tvabnoramlityGreater45Weight = dialogView.findViewById(R.id.abnoramlityGreater45Weight);
 
-        String overallLess45text = tvoverallLess45.getText().toString();
-        if(overallLess45text.isEmpty())
-            overallLess45text = "";
-        String overallLess45Weighttext = tvoverallLess45Weight.getText().toString();
-        if(overallLess45Weighttext.isEmpty())
-            overallLess45Weighttext = "";
-        String greeningLess45text = tvgreeningLess45.getText().toString();
-        if(greeningLess45text.isEmpty())
-            greeningLess45text = "";
-        String greeningLess45Weighttext = tvgreeningLess45Weight.getText().toString();
-        if(greeningLess45Weighttext.isEmpty())
-            greeningLess45Weighttext = "";
-        String crackingLess45text = tvcrackingLess45.getText().toString();
-        if(crackingLess45text.isEmpty())
-            crackingLess45text = "";
-        String crackingLess45Weighttext = tvcrackingLess45Weight.getText().toString();
-        if(crackingLess45Weighttext.isEmpty())
-            crackingLess45Weighttext = "";
-        String abnoramlityLess45text = tvabnoramlityLess45.getText().toString();
-        if(abnoramlityLess45text.isEmpty())
-            abnoramlityLess45text = "";
-        String abnoramlityLess45Weighttext = tvabnoramlityLess45Weight.getText().toString();
-        if(abnoramlityLess45Weighttext.isEmpty())
-            abnoramlityLess45Weighttext = "";
-        String overallGreater45text = tvoverallGreater45.getText().toString();
-        if(overallGreater45text.isEmpty())
-            overallGreater45text = "";
-        String overallGreater45Weighttext = tvoverallGreater45Weight.getText().toString();
-        if(overallGreater45Weighttext.isEmpty())
-            overallGreater45Weighttext = "";
-        String greeningGreater45text = tvgreeningGreater45.getText().toString();
-        if(greeningGreater45text.isEmpty())
-            greeningGreater45text = "";
-        String greeningGreater45Weighttext = tvgreeningGreater45Weight.getText().toString();
-        if(greeningGreater45Weighttext.isEmpty())
-            greeningGreater45Weighttext = "";
-        String crackingGreater45text = tvcrackingGreater45.getText().toString();
-        if(crackingGreater45text.isEmpty())
-            crackingGreater45text = "";
-        String crackingGreater45Weighttext = tvcrackingGreater45Weight.getText().toString();
-        if(crackingGreater45Weighttext.isEmpty())
-            crackingGreater45Weighttext = "";
-        String abnoramlityGreater45text = tvabnoramlityGreater45.getText().toString();
-        if(abnoramlityGreater45text.isEmpty())
-            abnoramlityGreater45text = "";
-        String abnoramlityGreater45Weighttext = tvabnoramlityGreater45Weight.getText().toString();
-        if(abnoramlityGreater45Weighttext.isEmpty())
-            abnoramlityGreater45Weighttext = "";
-
-        builder.setCancelable(false);
-
-        String finalOverallLess45text = overallLess45text;
-        String finalOverallLess45Weighttext = overallLess45Weighttext;
-        String finalGreeningLess45text = greeningLess45text;
-        String finalGreeningLess45Weighttext = greeningLess45Weighttext;
-        String finalCrackingLess45text = crackingLess45text;
-        String finalCrackingLess45Weighttext = crackingLess45Weighttext;
-        String finalAbnoramlityLess45text = abnoramlityLess45text;
-        String finalAbnoramlityLess45Weighttext = abnoramlityLess45Weighttext;
-        String finalOverallGreater45text = overallGreater45text;
-        String finalOverallGreater45Weighttext = overallGreater45Weighttext;
-        String finalGreeningGreater45text = greeningGreater45text;
-        String finalGreeningGreater45Weighttext = greeningGreater45Weighttext;
-        String finalCrackingGreater45text = crackingGreater45text;
-        String finalCrackingGreater45Weighttext = crackingGreater45Weighttext;
-        String finalAbnoramlityGreater45text = abnoramlityGreater45text;
-        String finalAbnoramlityGreater45Weighttext = abnoramlityGreater45Weighttext;
         builder.setPositiveButton("Save", (dialog, which) -> {
             // Handle OK button click
             LocalDate date = null;
             int yearOnly = 0;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 date = LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE);
                 yearOnly = date.getYear();
             } else {
@@ -639,26 +600,94 @@ public class UIUtils {
                 }
             }
 
+            String overallLess45text = tvoverallLess45.getText().toString();
+            if(overallLess45text.isEmpty())
+                overallLess45text = "";
+            String overallLess45Weighttext = tvoverallLess45Weight.getText().toString();
+            if(overallLess45Weighttext.isEmpty())
+                overallLess45Weighttext = "";
+            String greeningLess45text = tvgreeningLess45.getText().toString();
+            if(greeningLess45text.isEmpty())
+                greeningLess45text = "";
+            String greeningLess45Weighttext = tvgreeningLess45Weight.getText().toString();
+            if(greeningLess45Weighttext.isEmpty())
+                greeningLess45Weighttext = "";
+            String crackingLess45text = tvcrackingLess45.getText().toString();
+            if(crackingLess45text.isEmpty())
+                crackingLess45text = "";
+            String crackingLess45Weighttext = tvcrackingLess45Weight.getText().toString();
+            if(crackingLess45Weighttext.isEmpty())
+                crackingLess45Weighttext = "";
+            String abnoramlityLess45text = tvabnoramlityLess45.getText().toString();
+            if(abnoramlityLess45text.isEmpty())
+                abnoramlityLess45text = "";
+            String abnoramlityLess45Weighttext = tvabnoramlityLess45Weight.getText().toString();
+            if(abnoramlityLess45Weighttext.isEmpty())
+                abnoramlityLess45Weighttext = "";
+            String overallGreater45text = tvoverallGreater45.getText().toString();
+            if(overallGreater45text.isEmpty())
+                overallGreater45text = "";
+            String overallGreater45Weighttext = tvoverallGreater45Weight.getText().toString();
+            if(overallGreater45Weighttext.isEmpty())
+                overallGreater45Weighttext = "";
+            String greeningGreater45text = tvgreeningGreater45.getText().toString();
+            if(greeningGreater45text.isEmpty())
+                greeningGreater45text = "";
+            String greeningGreater45Weighttext = tvgreeningGreater45Weight.getText().toString();
+            if(greeningGreater45Weighttext.isEmpty())
+                greeningGreater45Weighttext = "";
+            String crackingGreater45text = tvcrackingGreater45.getText().toString();
+            if(crackingGreater45text.isEmpty())
+                crackingGreater45text = "";
+            String crackingGreater45Weighttext = tvcrackingGreater45Weight.getText().toString();
+            if(crackingGreater45Weighttext.isEmpty())
+                crackingGreater45Weighttext = "";
+            String abnoramlityGreater45text = tvabnoramlityGreater45.getText().toString();
+            if(abnoramlityGreater45text.isEmpty())
+                abnoramlityGreater45text = "";
+            String abnoramlityGreater45Weighttext = tvabnoramlityGreater45Weight.getText().toString();
+            if(abnoramlityGreater45Weighttext.isEmpty())
+                abnoramlityGreater45Weighttext = "";
+
+            builder.setCancelable(false);
+
+            String finalOverallLess45text = overallLess45text;
+            String finalOverallLess45Weighttext = overallLess45Weighttext;
+            String finalGreeningLess45text = greeningLess45text;
+            String finalGreeningLess45Weighttext = greeningLess45Weighttext;
+            String finalCrackingLess45text = crackingLess45text;
+            String finalCrackingLess45Weighttext = crackingLess45Weighttext;
+            String finalAbnoramlityLess45text = abnoramlityLess45text;
+            String finalAbnoramlityLess45Weighttext = abnoramlityLess45Weighttext;
+            String finalOverallGreater45text = overallGreater45text;
+            String finalOverallGreater45Weighttext = overallGreater45Weighttext;
+            String finalGreeningGreater45text = greeningGreater45text;
+            String finalGreeningGreater45Weighttext = greeningGreater45Weighttext;
+            String finalCrackingGreater45text = crackingGreater45text;
+            String finalCrackingGreater45Weighttext = crackingGreater45Weighttext;
+            String finalAbnoramlityGreater45text = abnoramlityGreater45text;
+            String finalAbnoramlityGreater45Weighttext = abnoramlityGreater45Weighttext;
+
             ArrayList<HarvestDetailPojo> dataList = new ArrayList<>();
 
-            HarvestDataPojo data1 = new HarvestDataPojo("Overall","<45mm", "No. Of Tubers", finalOverallLess45text);
-            HarvestDataPojo data2 = new HarvestDataPojo("Overall","<45mm", "Tuber Weight", finalOverallLess45Weighttext);
-            HarvestDataPojo data3 = new HarvestDataPojo("Greening","<45mm", "No. Of Tubers", finalGreeningLess45text);
-            HarvestDataPojo data4 = new HarvestDataPojo("Greening","<45mm", "Tuber Weight", finalGreeningLess45Weighttext);
-            HarvestDataPojo data5 = new HarvestDataPojo("Cracking","<45mm", "No. Of Tubers", finalCrackingLess45text);
-            HarvestDataPojo data6 = new HarvestDataPojo("Cracking","<45mm", "Tuber Weight", finalCrackingLess45Weighttext);
-            HarvestDataPojo data7 = new HarvestDataPojo("Abnormality","<45mm", "No. Of Tubers", finalAbnoramlityLess45text);
-            HarvestDataPojo data8 = new HarvestDataPojo("Abnormality","<45mm", "Tuber Weight", finalAbnoramlityLess45Weighttext);
-            HarvestDataPojo data9 = new HarvestDataPojo("Overall",">45mm", "No. Of Tubers", finalOverallGreater45text);
-            HarvestDataPojo data10 = new HarvestDataPojo("Overall",">45mm", "Tuber Weight", finalOverallGreater45Weighttext);
-            HarvestDataPojo data11= new HarvestDataPojo("Greening",">45mm", "No. Of Tubers", finalGreeningGreater45text);
-            HarvestDataPojo data12 = new HarvestDataPojo("Greening",">45mm", "Tuber Weight", finalGreeningGreater45Weighttext);
-            HarvestDataPojo data13 = new HarvestDataPojo("Cracking",">45mm", "No. Of Tubers", finalCrackingGreater45text);
-            HarvestDataPojo data14 = new HarvestDataPojo("Cracking",">45mm", "Tuber Weight", finalCrackingGreater45Weighttext);
-            HarvestDataPojo data15 = new HarvestDataPojo("Abnormality",">45mm", "No. Of Tubers", finalAbnoramlityGreater45text);
-            HarvestDataPojo data16 = new HarvestDataPojo("Abnormality",">45mm", "Tuber Weight", finalAbnoramlityGreater45Weighttext);
+            HarvestDataPojo data1 = new HarvestDataPojo("Overall", "<45", "No. Of Tubers", finalOverallLess45text);
+            HarvestDataPojo data2 = new HarvestDataPojo("Overall", "<45", "Tuber Weight", finalOverallLess45Weighttext);
+            HarvestDataPojo data3 = new HarvestDataPojo("Greening", "<45", "No. Of Tubers", finalGreeningLess45text);
+            HarvestDataPojo data4 = new HarvestDataPojo("Greening", "<45", "Tuber Weight", finalGreeningLess45Weighttext);
+            HarvestDataPojo data5 = new HarvestDataPojo("Cracking", "<45", "No. Of Tubers", finalCrackingLess45text);
+            HarvestDataPojo data6 = new HarvestDataPojo("Cracking", "<45", "Tuber Weight", finalCrackingLess45Weighttext);
+            HarvestDataPojo data7 = new HarvestDataPojo("Abnormality", "<45", "No. Of Tubers", finalAbnoramlityLess45text);
+            HarvestDataPojo data8 = new HarvestDataPojo("Abnormality", "<45", "Tuber Weight", finalAbnoramlityLess45Weighttext);
+            HarvestDataPojo data9 = new HarvestDataPojo("Overall", ">45", "No. Of Tubers", finalOverallGreater45text);
+            HarvestDataPojo data10 = new HarvestDataPojo("Overall", ">45", "Tuber Weight", finalOverallGreater45Weighttext);
+            HarvestDataPojo data11 = new HarvestDataPojo("Greening", ">45", "No. Of Tubers", finalGreeningGreater45text);
+            HarvestDataPojo data12 = new HarvestDataPojo("Greening", ">45", "Tuber Weight", finalGreeningGreater45Weighttext);
+            HarvestDataPojo data13 = new HarvestDataPojo("Cracking", ">45", "No. Of Tubers", finalCrackingGreater45text);
+            HarvestDataPojo data14 = new HarvestDataPojo("Cracking", ">45", "Tuber Weight", finalCrackingGreater45Weighttext);
+            HarvestDataPojo data15 = new HarvestDataPojo("Abnormality", ">45", "No. Of Tubers", finalAbnoramlityGreater45text);
+            HarvestDataPojo data16 = new HarvestDataPojo("Abnormality", ">45", "Tuber Weight", finalAbnoramlityGreater45Weighttext);
 
-            HarvestDetailPojo pojo = new HarvestDetailPojo(locationId, yearOnly+"", trialTypeId, vatietyCode, replicationName);
+            HarvestDetailPojo pojo = new HarvestDetailPojo(locationId, yearOnly + "", trialTypeId, vatietyCode, replicationName);
             pojo.harvest_data = new ArrayList<>();
             pojo.harvest_data.add(data1);
             pojo.harvest_data.add(data2);
@@ -679,8 +708,8 @@ public class UIUtils {
 
             dataList.add(pojo);
 
-            Gson gson = new Gson();
-            String jsonString = gson.toJson(pojo);
+            /*Gson gson = new Gson();
+            String jsonString = gson.toJson(pojo);*/
 
             if (UIUtils.isNetworkAvailable(context)) {
                 callAPiForHarvest(context, pojo);
@@ -688,9 +717,7 @@ public class UIUtils {
                 Toast.makeText(context, context.getString(R.string.data_not_saved_internet), Toast.LENGTH_SHORT).show();
             }
 
-        });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> {
+        }).setNegativeButton("Cancel", (dialog, which) -> {
             // Handle Cancel button click
             dialog.dismiss();
         });
@@ -709,13 +736,19 @@ public class UIUtils {
     private static void callAPiForHarvest(Context context, HarvestDetailPojo dataList) {
         apiInterface = APIClient.getClient().create(APIInterface.class);
         Call<UserLoginResponse> call = apiInterface.observationharvest(dataList);
-        /*Gson gson = new Gson();
 
-        // Convert POJO to JSON
-        String jsonString = gson.toJson(dapPojo);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.getSerializerProvider().setNullValueSerializer(new StringSerializer());
+        String jsonString = null;
+        try {
+            jsonString = objectMapper.writeValueAsString(dataList);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-        // Print the JSON representation
-        System.out.println(jsonString);*/
+        // Use the JSON string as needed
+        System.out.println(jsonString);
+
         call.enqueue(new Callback<UserLoginResponse>() {
             @Override
             public void onResponse(Call<UserLoginResponse> call, Response<UserLoginResponse> response) {
@@ -749,9 +782,9 @@ public class UIUtils {
             Toast.makeText(context, "Please enter L1 reading", Toast.LENGTH_SHORT).show();
         } else if(textL2.length()<1){
             Toast.makeText(context, "Please enter L2 reading", Toast.LENGTH_SHORT).show();
-        } else if(textL3.length()<1){
+        } else if(textL3.length()<1 && !isViewVisible){
             Toast.makeText(context, "Please enter L3 reading", Toast.LENGTH_SHORT).show();
-        } else if(textL4.length()<1){
+        } else if(textL4.length()<1 && !trialTypeId.equalsIgnoreCase("TRL-3") && !isViewVisible){
             Toast.makeText(context, "Please enter L4 reading", Toast.LENGTH_SHORT).show();
         } else {
             LocalDate date = null;
@@ -804,13 +837,13 @@ public class UIUtils {
     private static void callApiForDapInsertion(Context context, DAPPojo dapPojo) {
         apiInterface = APIClient.getClient().create(APIInterface.class);
         Call<UserLoginResponse> call = apiInterface.observation(dapPojo);
-        /*Gson gson = new Gson();
+        Gson gson = new Gson();
 
         // Convert POJO to JSON
         String jsonString = gson.toJson(dapPojo);
 
         // Print the JSON representation
-        System.out.println(jsonString);*/
+        System.out.println(jsonString);
         call.enqueue(new Callback<UserLoginResponse>() {
             @Override
             public void onResponse(Call<UserLoginResponse> call, Response<UserLoginResponse> response) {

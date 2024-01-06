@@ -34,7 +34,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity"/>
+        <activity android:name=".LoginActivity"
+            android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".MainMenuActivity"
             android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".pojo.layout.FieldLayoutActivity"

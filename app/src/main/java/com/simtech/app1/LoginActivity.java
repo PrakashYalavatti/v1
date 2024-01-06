@@ -19,6 +19,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -36,6 +37,7 @@ import com.simtech.app1.apiservices.APIClient;
 import com.simtech.app1.apiservices.APIInterface;
 import com.simtech.app1.apiservices.apirequestresponse.UserLoginRequest;
 import com.simtech.app1.apiservices.apirequestresponse.UserLoginResponse;
+import com.simtech.app1.apputils.HTTPSConnection;
 import com.simtech.app1.apputils.UIUtils;
 import com.simtech.app1.sqlite.DBManager;
 
@@ -182,6 +184,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginApiCall(String strUserName, String strUserPassword) {
+        HTTPSConnection.trustAllHosts();
         UserLoginRequest user = new UserLoginRequest(strUserName, strUserPassword);
         Call<UserLoginResponse> call = apiInterface.createUser(user);
         call.enqueue(new Callback<UserLoginResponse>() {
@@ -744,6 +747,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         if(UIUtils.isNetworkAvailable(LoginActivity.this)){
             SharedPreferences mCredentialsStorage;
             mCredentialsStorage = getSharedPreferences("AppSharedPreferences", MODE_PRIVATE);

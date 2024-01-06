@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -143,13 +144,11 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
     }
 
     private void callInsertPlantingAPI() {
-        progressBar.setVisibility(View.VISIBLE);
+
         String pp = ppEditText.getText().toString();
         String rr = rrEditText.getText().toString();
 
         ArrayList<PlantatingVarietyDataPojo> insertPlantationData = plantingResponse.data.get(0).plantation_data;
-        plantingResponse.data.get(0).pp = ppEditText.getText().toString();
-        plantingResponse.data.get(0).rr = rrEditText.getText().toString();
         Iterator<PlantatingVarietyDataPojo> iterator = insertPlantationData.iterator();
 
         while (iterator.hasNext()) {
@@ -160,7 +159,15 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
                 dataPojo.sample3 = "";
             }
         }
-        if(pp.length()>0 && rr.length()>0){
+
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(plantingResponse);
+        Log.d("JsonString ", jsonString);
+
+        if (pp.length() > 0 && rr.length() > 0) {
+            progressBar.setVisibility(View.VISIBLE);
+            plantingResponse.data.get(0).pp = ppEditText.getText().toString();
+            plantingResponse.data.get(0).rr = rrEditText.getText().toString();
 
             Call<UserLoginResponse> call = apiInterface.plantationupdate(plantingResponse);
             call.enqueue(new Callback<UserLoginResponse>() {
@@ -200,10 +207,9 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
                 }
             });
         } else {
-            UIUtils.customToastMsg(PlantationActivity.this, "Please enter P*P/R*R");
+//            UIUtils.customToastMsg(PlantationActivity.this, "Please enter P*P/R*R");
+            Toast.makeText(this, "Please enter P*P/R*R", Toast.LENGTH_SHORT).show();
         }
-
-
     }
 
     private void callApi() {
@@ -225,7 +231,8 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
                                     locationTextView.setText("Location: " + data.locationname);
                                     plantingDateTextView.setText("Planting Date: " + data.startdate);
                                     selectedTrialTypeTextView.setText("Trial Type: " + data.trialtypename);
-
+                                    ppEditText.setText(data.pp);
+                                    rrEditText.setText(data.rr);
                                     /*if(data.trialtypename.contains("FastTrack")){
                                         tvSample3.setVisibility(View.GONE);
                                     } else {
@@ -292,7 +299,7 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
         apiInterface = APIClient.getClient().create(APIInterface.class);
 
         if (UIUtils.isNetworkAvailable(PlantationActivity.this)) {
-            if(token != null && userName != null) {
+            if (token != null && userName != null) {
                 callServerDateTimeAPi(token, userName);
             }
             callApi();
@@ -354,7 +361,7 @@ public class PlantationActivity extends AppCompatActivity implements EditPlantin
                                     String deviceCurrentDateTime = UIUtils.getCurrentDateTime();
                                     int timeDiff = Integer.parseInt(UIUtils.findDifference(serverDateTimeString, deviceCurrentDateTime));
                                     // 335 is the converted minutes for indian timing -- 5:30 + 5 minutes
-                                    if((Math.abs(timeDiff) >= 335)){
+                                    if ((Math.abs(timeDiff) >= 335)) {
                                         Toast.makeText(PlantationActivity.this, getString(R.string.time_diff) + 5 + " minutes", Toast.LENGTH_LONG).show();
                                         Intent intent = new Intent(Settings.ACTION_DATE_SETTINGS);
                                         dateSettingsLauncher.launch(intent);
